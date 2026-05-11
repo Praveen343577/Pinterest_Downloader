@@ -1,0 +1,4 @@
+# Place Pinterest URLs below, one per line.
+# Lines starting with # are ignored.
+# Supported URL types include board URLs (.../username/boardname/), profile URLs (.../username/), and single pin URLs (.../pin/123456789/).
+# Non-Pinterest URLs will be skipped automatically.

@@ -1,0 +1,4 @@
+# Netscape HTTP Cookie File
+# To use this program, you must export your cookies while logged into Pinterest in a browser.
+# Use an extension such as "Get cookies.txt LOCALLY" (Chrome) or "cookies.txt" (Firefox).
+# Save the exported file here, replacing all existing content. Do not edit the file manually.
