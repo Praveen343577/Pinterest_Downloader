@@ -44,7 +44,7 @@ class DashboardManager:
             BarColumn(),
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TextColumn("{task.completed} / {task.total} links"),
-            TextColumn("[green]✔ {task.fields[success]}[/green] [red]✖ {task.fields[fail]}[/red]")
+            TextColumn("[green][OK] {task.fields[success]}[/green] [red][X] {task.fields[fail]}[/red]")
         )
         self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0)
         self.live = Live(self.progress, console=console, refresh_per_second=4)
@@ -60,7 +60,7 @@ class DashboardManager:
         
         elapsed = time.time() - self.link_start_time if self.link_start_time else 0
         ips = (self.link_items / elapsed) if elapsed > 0 else 0
-        stats_str = f"↓ {self.link_items} items | {int(elapsed//60):02d}:{int(elapsed%60):02d} | {ips:.1f} items/sec | Session {self.session_pos} — Link {self.link_pos} / 25"
+        stats_str = f"DL: {self.link_items} items | {int(elapsed//60):02d}:{int(elapsed%60):02d} | {ips:.1f} items/sec | Session {self.session_pos} - Link {self.link_pos} / 25"
         grid.add_row(Text(stats_str, style="cyan"))
         
         total_elapsed = time.time() - self.total_start_time
@@ -118,10 +118,10 @@ class DashboardManager:
         self.update_display()
 
     def set_cooldown(self, remaining, total):
-        self.delay_msg = f"Session cooldown — resuming in {int(remaining//60):02d}:{int(remaining%60):02d} of {int(total//60):02d}:{int(total%60):02d}"
+        self.delay_msg = f"Session cooldown - resuming in {int(remaining//60):02d}:{int(remaining%60):02d} of {int(total//60):02d}:{int(total%60):02d}"
         self.update_display()
 
     def print_result(self, success, status, items, url):
-        mark = "[green]✔[/green]" if success else "[red]✖[/red]"
+        mark = "[green][OK][/green]" if success else "[red][X][/red]"
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
         console.log(f"{mark} {status:<10} [{items}] {trunc_url}")

@@ -1,22 +1,36 @@
 import subprocess
 import time
+import urllib.request
 import config
+
+def resolve_url(url):
+    if "pin.it" in url.lower():
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            resp = urllib.request.urlopen(req, timeout=15)
+            resolved = resp.geturl()
+            resp.close()
+            return resolved
+        except Exception:
+            pass
+    return url
 
 def download_url(url, callback=None):
     start_time = time.time()
     
-    template = "{username|unknown_user} {'v' if extension in ['mp4', 'webm', 'mov', 'm4v', 'avi'] else 'p'}{num}.{extension}"
+    actual_url = resolve_url(url)
+    
+    template = "{id}_{num}.{extension}"
     
     cmd = [
         config.GALLERY_DL_PATH,
         "--cookies", config.COOKIE_FILE,
         "--directory", config.OUTPUT_BASE,
+        "-o", "directory=[\".\"]",
         "--filename", template,
         "--write-metadata",
         "--no-skip",
-        "-q",
-        "--print", "url",
-        url
+        actual_url
     ]
     
     creationflags = 0x08000000 
