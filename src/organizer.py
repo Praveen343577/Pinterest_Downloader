@@ -41,7 +41,7 @@ def organize_metadata():
                 "account_name": account_name,
                 "board_name": board.get("name"),
                 "board_url": board.get("url"),
-                "title": data.get("seo_title") or data.get("grid_title") or data.get("title"),
+                "title": data.get("grid_title") or data.get("title") or data.get("seo_title"),
                 "description": data.get("description") or data.get("closeup_description"),
                 "file_type": ext,
                 "repin_count": data.get("repin_count"),
