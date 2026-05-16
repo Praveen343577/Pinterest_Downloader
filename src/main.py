@@ -44,7 +44,7 @@ def main():
                 dash.update_item_count(count)
                 
             result = download_url(url, callback=cb)
-            organize_metadata()
+            result['extracted_metadata'] = organize_metadata()
             session_logger.record(result)
             
             success = result['status'] == 'SUCCESS'
