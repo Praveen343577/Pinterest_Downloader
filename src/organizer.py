@@ -12,6 +12,7 @@ def extract_account_name(data):
     return "unknown_user"
 
 def organize_metadata():
+    extracted_metadata = []
     for filename in os.listdir(config.OUTPUT_BASE):
         if filename.endswith(".json"):
             json_path = os.path.join(config.OUTPUT_BASE, filename)
@@ -29,6 +30,24 @@ def organize_metadata():
                     
             account_name = extract_account_name(data)
             ext = media_filename.split('.')[-1].lower() if '.' in media_filename else 'unknown'
+            
+            pinner = data.get("pinner") or {}
+            native_creator = data.get("native_creator") or {}
+            board = data.get("board") or {}
+
+            extracted_metadata.append({
+                "pin_id": data.get("id"),
+                "username": pinner.get("full_name") or native_creator.get("full_name"),
+                "account_name": account_name,
+                "board_name": board.get("name"),
+                "board_url": board.get("url"),
+                "title": data.get("seo_title") or data.get("grid_title") or data.get("title"),
+                "description": data.get("description") or data.get("closeup_description"),
+                "file_type": ext,
+                "repin_count": data.get("repin_count"),
+                "created_at": data.get("created_at")
+            })
+
             type_prefix = 'v' if ext in ['mp4', 'webm', 'mov', 'm4v', 'avi'] else 'p'
             
             seq_num = 1
@@ -49,3 +68,5 @@ def organize_metadata():
                 
             dst_json_path = os.path.join(config.METADATA_DIR, new_json_filename)
             shutil.move(json_path, dst_json_path)
+            
+    return extracted_metadata
