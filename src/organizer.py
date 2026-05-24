@@ -3,14 +3,6 @@ import shutil
 import json
 import config
 
-def extract_account_name(data):
-    for key in ['native_creator', 'pinner', 'origin_pinner', 'owner', 'closeup_attribution']:
-        if key in data and data[key] and 'username' in data[key]:
-            return data[key]['username']
-    if 'board' in data and data['board'] and 'owner' in data['board'] and 'username' in data['board']['owner']:
-        return data['board']['owner']['username']
-    return "unknown_user"
-
 def organize_metadata():
     extracted_metadata = []
     for filename in os.listdir(config.OUTPUT_BASE):
@@ -28,17 +20,29 @@ def organize_metadata():
                 except json.JSONDecodeError:
                     continue
                     
-            account_name = extract_account_name(data)
+            native_creator = data.get("native_creator") or {}
+            closeup_attr = data.get("closeup_attribution") or {}
+            closeup_unified = data.get("closeup_unified_attribution") or {}
+            third_party = data.get("third_party_pin_owner") or {}
+            origin_pinner = data.get("origin_pinner") or {}
+            pinner = data.get("pinner") or {}
+            board = data.get("board") or {}
+            owner = board.get("owner") or {}
+
+            account_name = "unknown_user"
+            full_name = None
+            
+            for entity in [native_creator, closeup_attr, closeup_unified, third_party, origin_pinner, pinner, owner]:
+                if entity and entity.get("username"):
+                    account_name = entity.get("username")
+                    full_name = entity.get("full_name") or account_name
+                    break
+
             ext = media_filename.split('.')[-1].lower() if '.' in media_filename else 'unknown'
             
-            pinner = data.get("pinner") or {}
-            native_creator = data.get("native_creator") or {}
-            board = data.get("board") or {}
-            closeup_attribution = data.get("closeup_attribution") or {}
-
             extracted_metadata.append({
                 "pin_id": data.get("id"),
-                "username": pinner.get("full_name") or native_creator.get("full_name") or closeup_attribution.get("full_name"),
+                "username": full_name,
                 "account_name": account_name,
                 "board_name": board.get("name"),
                 "board_url": board.get("url"),
