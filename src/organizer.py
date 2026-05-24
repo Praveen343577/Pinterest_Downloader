@@ -4,7 +4,7 @@ import json
 import config
 
 def extract_account_name(data):
-    for key in ['native_creator', 'pinner', 'origin_pinner', 'owner']:
+    for key in ['native_creator', 'pinner', 'origin_pinner', 'owner', 'closeup_attribution']:
         if key in data and data[key] and 'username' in data[key]:
             return data[key]['username']
     if 'board' in data and data['board'] and 'owner' in data['board'] and 'username' in data['board']['owner']:
@@ -34,10 +34,11 @@ def organize_metadata():
             pinner = data.get("pinner") or {}
             native_creator = data.get("native_creator") or {}
             board = data.get("board") or {}
+            closeup_attribution = data.get("closeup_attribution") or {}
 
             extracted_metadata.append({
                 "pin_id": data.get("id"),
-                "username": pinner.get("full_name") or native_creator.get("full_name"),
+                "username": pinner.get("full_name") or native_creator.get("full_name") or closeup_attribution.get("full_name"),
                 "account_name": account_name,
                 "board_name": board.get("name"),
                 "board_url": board.get("url"),
