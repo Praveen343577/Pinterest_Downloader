@@ -1,3 +1,6 @@
+**pycache**/
+*.py[cod]
+
 resources/
 Cookie.txt
 Links.txt
