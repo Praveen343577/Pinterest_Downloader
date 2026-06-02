@@ -124,4 +124,4 @@ class DashboardManager:
     def print_result(self, success, status, items, url):
         mark = "[green][OK][/green]" if success else "[red][X][/red]"
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
-        console.log(f"{mark} {status:<10} [{items}] {trunc_url}")
+        console.print(f"{mark} {status:<10} [{items}] {trunc_url}")
