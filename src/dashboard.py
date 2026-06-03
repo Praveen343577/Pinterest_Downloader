@@ -12,17 +12,14 @@ console = Console()
 
 def print_header(total_links, log_name):
     sessions = math.ceil(total_links / 25)
-    console.print(Panel(
-        f"Valid Links: {total_links} | Total Sessions: {sessions}\n"
-        f"Log File: {log_name}\nOutput Dir: {config.OUTPUT_BASE}",
-        title="Pinterest Downloader", style="cyan"
-    ))
+    console.print(f"\nTotal Links: {total_links} | Total Sessions: {sessions}\n"
+                  f"Log File: {log_name}\nSaved to: {config.OUTPUT_BASE}\n")
 
 def print_preflight_success(msg):
-    console.print(Panel(msg, title="Preflight Checks Passed", style="green"))
+    console.print(f"{msg}\n")
 
 def print_summary(total_time, success, failed):
-    console.print(Panel(f"Execution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed}", title="Summary", style="bold blue"))
+    console.print(f"\nExecution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed}\n")
 
 class DashboardManager:
     def __init__(self, total_links):
@@ -44,10 +41,11 @@ class DashboardManager:
             BarColumn(),
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TextColumn("{task.completed} / {task.total} links"),
-            TextColumn("[green][OK] {task.fields[success]}[/green] [red][X] {task.fields[fail]}[/red]")
+            TextColumn("[green][OK] {task.fields[success]}[/green] [red][XX] {task.fields[fail]}[/red]")
         )
         self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0)
         self.live = Live(self.progress, console=console, refresh_per_second=4)
+        self.results_log = []
 
     def _build_grid(self):
         grid = Table.grid(expand=True)
@@ -56,7 +54,7 @@ class DashboardManager:
         grid.add_row(self.progress)
         
         trunc_url = self.current_url[:80] + ("..." if len(self.current_url) > 80 else "")
-        grid.add_row(Text(f"URL: {trunc_url}", style="dim white"))
+        grid.add_row(Text(f"Downloading: {trunc_url}", style="dim white"))
         
         elapsed = time.time() - self.link_start_time if self.link_start_time else 0
         ips = (self.link_items / elapsed) if elapsed > 0 else 0
@@ -71,7 +69,7 @@ class DashboardManager:
         else:
             eta_str = "--:--"
             
-        overall_str = f"Total Elapsed: {int(total_elapsed//3600):02d}:{int((total_elapsed%3600)//60):02d}:{int(total_elapsed%60):02d} | ETA: {eta_str}"
+        overall_str = f"Total Time Elapsed: {int(total_elapsed//3600):02d}:{int((total_elapsed%3600)//60):02d}:{int(total_elapsed%60):02d} | ETA: {eta_str}"
         grid.add_row(Text(overall_str, style="yellow"))
         
         if self.delay_msg:
@@ -122,6 +120,10 @@ class DashboardManager:
         self.update_display()
 
     def print_result(self, success, status, items, url):
-        mark = "[green][OK][/green]" if success else "[red][X][/red]"
+        mark = "[green][OK][/green]" if success else "[red][XX][/red]"
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
-        console.print(f"{mark} {status:<10} [{items}] {trunc_url}")
+        self.results_log.append(f"{mark} {status:<10} [{items}] {trunc_url}")
+        
+    def flush_results(self):
+        for res in self.results_log:
+            console.print(res)

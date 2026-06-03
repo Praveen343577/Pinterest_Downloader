@@ -69,6 +69,7 @@ def main():
 
     session_logger.write()
     print_summary(time.time() - start_time, session_logger.success_count if hasattr(session_logger, 'success_count') else sum(1 for d in session_logger.link_details if d['status'] == 'SUCCESS'), sum(1 for d in session_logger.link_details if d['status'] != 'SUCCESS' and d['status'] != 'INVALID_URL'))
-
+    dash.flush_results()
+    
 if __name__ == "__main__":
     main()
