@@ -76,6 +76,11 @@ class DashboardManager:
             style = "magenta" if "cooldown" in self.delay_msg.lower() else "yellow"
             grid.add_row(Text(self.delay_msg, style=style))
             
+        if self.results_log:
+            grid.add_row("")
+            for res in self.results_log:
+                grid.add_row(res)
+
         return grid
 
     def update_display(self):
@@ -123,7 +128,8 @@ class DashboardManager:
         mark = "[green][OK][/green]" if success else "[red][XX][/red]"
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
         self.results_log.append(f"{mark} {status:<10} [{items}] {trunc_url}")
-        
-    def flush_results(self):
-        for res in self.results_log:
-            console.print(res)
+        self.update_display()
+
+    # def flush_results(self):
+    #     for res in self.results_log:
+    #         console.print(res)
