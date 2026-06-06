@@ -131,7 +131,3 @@ class DashboardManager:
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
         self.results_log.append(f"{mark} {status:<10} [{items}] {trunc_url}")
         self.update_display()
-
-    # def flush_results(self):
-    #     for res in self.results_log:
-    #         console.print(res)
