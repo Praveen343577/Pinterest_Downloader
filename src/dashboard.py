@@ -70,17 +70,19 @@ class DashboardManager:
             eta_str = "--:--"
             
         overall_str = f"Total Time Elapsed: {int(total_elapsed//3600):02d}:{int((total_elapsed%3600)//60):02d}:{int(total_elapsed%60):02d} | ETA: {eta_str}"
-        grid.add_row(Text(overall_str, style="yellow"))
+        text_row = Text(overall_str, style="yellow")
         
         if self.delay_msg:
             style = "magenta" if "cooldown" in self.delay_msg.lower() else "yellow"
-            grid.add_row(Text(self.delay_msg, style=style))
+            text_row.append(f" | {self.delay_msg}", style=style)
             
+        grid.add_row(text_row)
+        
         if self.results_log:
             grid.add_row("")
             for res in self.results_log:
                 grid.add_row(res)
-
+                
         return grid
 
     def update_display(self):
