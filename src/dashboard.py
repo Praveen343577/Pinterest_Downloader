@@ -11,7 +11,7 @@ import config
 console = Console()
 
 def print_header(total_links, log_name):
-    sessions = math.ceil(total_links / 25)
+    sessions = math.ceil(total_links / config.SESSION_SIZE)
     console.print(f"\nTotal Links: {total_links} | Total Sessions: {sessions}\n"
                   f"Log File: {log_name}\nSaved to: {config.OUTPUT_BASE}\n")
 
@@ -58,7 +58,7 @@ class DashboardManager:
         
         elapsed = time.time() - self.link_start_time if self.link_start_time else 0
         ips = (self.link_items / elapsed) if elapsed > 0 else 0
-        stats_str = f"DL: {self.link_items} items | {int(elapsed//60):02d}:{int(elapsed%60):02d} | {ips:.1f} items/sec | Session {self.session_pos} - Link {self.link_pos} / 25"
+        stats_str = f"DL: {self.link_items} items | {int(elapsed//60):02d}:{int(elapsed%60):02d} | {ips:.1f} items/sec | Session {self.session_pos} - Link {self.link_pos} / {config.SESSION_SIZE}"
         grid.add_row(Text(stats_str, style="cyan"))
         
         total_elapsed = time.time() - self.total_start_time
@@ -100,8 +100,8 @@ class DashboardManager:
         self.current_url = url
         self.link_items = 0
         self.link_start_time = time.time()
-        self.session_pos = (index // 25) + 1
-        self.link_pos = (index % 25) + 1
+        self.session_pos = (index // config.SESSION_SIZE) + 1
+        self.link_pos = (index % config.SESSION_SIZE) + 1
         self.delay_msg = ""
         self.update_display()
 
