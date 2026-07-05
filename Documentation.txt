@@ -16,3 +16,10 @@ Accurate Rate-Limiting: As a huge bonus, expanding boards into individual pins m
                         Previously, downloading a board with 1,000 pins would have bypassed limits and downloaded all 1,000 at once!
 
 Added an indicator Extracting individual pin URLs from boards/profiles... that user will see in the terminal, as expanding a large board URL might take a few moments before the download session begins.
+
+
+
+Date : 05-Jul-2026
+
+- Added animated dots at the end of extraction message.
+- Added time elapsed and eta at the end of the extraction.

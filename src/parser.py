@@ -2,6 +2,13 @@ import re
 import config
 import subprocess
 from rich.console import Console
+from rich.progress import Progress, TextColumn, TimeElapsedColumn, TimeRemainingColumn, SpinnerColumn
+import rich._spinners
+
+rich._spinners.SPINNERS["my_dots"] = {
+    "interval": 400,
+    "frames": ["   ", ".  ", ".. ", "..."]
+}
 
 console = Console()
 
@@ -46,9 +53,19 @@ def parse_links():
                 invalid_urls.append((i, line))
                 
     if raw_valid:
-        console.print("[yellow]Extracting individual pin URLs from boards/profiles...[/yellow]")
-        for url in raw_valid:
-            valid_urls.extend(expand_url(url))
+        with Progress(
+            TextColumn("[yellow]Extracting individual pin URLs from boards/profiles[/yellow]"),
+            SpinnerColumn("my_dots", style="yellow"),
+            TextColumn(" | [cyan]Elapsed:[/cyan]"),
+            TimeElapsedColumn(),
+            TextColumn(" | [cyan]ETA:[/cyan]"),
+            TimeRemainingColumn(),
+            console=console
+        ) as progress:
+            task = progress.add_task("", total=len(raw_valid))
+            for url in raw_valid:
+                valid_urls.extend(expand_url(url))
+                progress.update(task, advance=1)
             
     return valid_urls, invalid_urls
 
