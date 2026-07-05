@@ -1,8 +1,11 @@
 **pycache**/
 *.py[cod]
 
+Pinterest/
 resources/
+
 Cookie.txt
 Links.txt
+Todo.txt
+
 build.bat
-Pinterest/
