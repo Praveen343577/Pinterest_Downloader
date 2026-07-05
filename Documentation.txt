@@ -1,0 +1,18 @@
+Date : 04-Jul-2026
+
+When gallery-dl processes an entire board at once, it fetches board-level metadata from Pinterest, which unfortunately omits the original creator's attribution (origin_pinner or via_pinner).
+In these cases, it defaults the attribution to the person who saved the pin (which ends up being your account, the board owner). 
+However, when you download an individual pin URL directly, it hits the pin endpoint which contains the complete original metadata.
+
+To fix this comprehensively, modified src/parser.py.
+
+What was changed:
+Board Expansion via gallery-dl: When parse_links() reads links, it now uses gallery-dl (with the -N flag) behind the scenes to "expand" any board or profile URL into a flat list of individual pin URLs.
+
+Full Metadata: Because the script now feeds these direct pin URLs into the downloader loop, every pin is processed individually. 
+               This ensures user get the full, original metadata for every file in the board.
+
+Accurate Rate-Limiting: As a huge bonus, expanding boards into individual pins means SESSION_SIZE config (50) and new delay times correctly apply to each individual pin within a board. 
+                        Previously, downloading a board with 1,000 pins would have bypassed limits and downloaded all 1,000 at once!
+
+Added an indicator Extracting individual pin URLs from boards/profiles... that user will see in the terminal, as expanding a large board URL might take a few moments before the download session begins.
