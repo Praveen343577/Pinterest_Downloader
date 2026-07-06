@@ -40,7 +40,7 @@ def organize_metadata():
 
             ext = media_filename.split('.')[-1].lower() if '.' in media_filename else 'unknown'
             
-            extracted_metadata.append({
+            new_entry = {
                 "pin_id": data.get("id"),
                 "username": full_name,
                 "account_name": account_name,
@@ -51,7 +51,9 @@ def organize_metadata():
                 "file_type": ext,
                 "repin_count": data.get("repin_count"),
                 "created_at": data.get("created_at")
-            })
+            }
+            if new_entry not in extracted_metadata:
+                extracted_metadata.append(new_entry)
 
             type_prefix = 'v' if ext in ['mp4', 'webm', 'mov', 'm4v', 'avi'] else 'p'
             
