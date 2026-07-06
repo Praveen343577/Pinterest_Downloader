@@ -31,6 +31,8 @@ def expand_url(url):
         )
         stdout, _ = process.communicate(timeout=120)
         urls = [line.strip() for line in stdout.split('\n') if line.strip().startswith("http")]
+        # Remove duplicates while preserving order
+        urls = list(dict.fromkeys(urls))
         return urls if urls else [url]
     except Exception:
         return [url]
@@ -66,6 +68,9 @@ def parse_links():
             for url in raw_valid:
                 valid_urls.extend(expand_url(url))
                 progress.update(task, advance=1)
+                
+    # Remove duplicates globally while preserving order
+    valid_urls = list(dict.fromkeys(valid_urls))
             
     return valid_urls, invalid_urls
 

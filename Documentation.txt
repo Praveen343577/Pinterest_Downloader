@@ -19,7 +19,23 @@ Added an indicator Extracting individual pin URLs from boards/profiles... that u
 
 
 
-Date : 05-Jul-2026
+Date : 06-Jul-2026
 
 - Added animated dots at the end of extraction message.
 - Added time elapsed and eta at the end of the extraction.
+
+
+
+Date : 07-Jul-2026
+
+- Resolved Major Issue #5 [Fix: Pin Duplication during Board Downloads].
+- Because gallery-dl outputs the pin URL once for each media item inside a pin when extracting a board. 
+    This meant that a pin with 3 media items would result in 3 identical pin URLs being sent to the downloader
+    which then downloaded all 3 media items for each of those 3 identical links (resulting in 9 downloads).
+
+- Updated parser.py to ensure that duplicate URLs are filtered out:
+
+- When extracting URLs from a board, it now immediately deduplicates the list of pin URLs 
+    while preserving their original order.
+- It also globally deduplicates all processed URLs before handing them off to the downloader, 
+    which ensures that if multiple boards share the same pin, it will still only download once.
