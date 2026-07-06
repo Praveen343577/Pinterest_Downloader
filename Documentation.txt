@@ -28,7 +28,7 @@ Date : 06-Jul-2026
 
 Date : 07-Jul-2026
 
-- Resolved Major Issue #5 [Fix: Pin Duplication during Board Downloads].
+- Resolved Major Issue #5.1 [Fix: Pin Duplication during Board Downloads].
 
 - Because gallery-dl outputs the pin URL once for each media item inside a pin when extracting a board. 
     This meant that a pin with 3 media items would result in 3 identical pin URLs being sent to the downloader
@@ -42,7 +42,7 @@ Date : 07-Jul-2026
     which ensures that if multiple boards share the same pin, it will still only download once.
 
 
-- Resolved Major Issue #5 [Fix: Log Duplication multiple media items].
+- Resolved Major Issue #5.2 [Fix: Log Duplication multiple media items].
 
 - When organize_metadata() gathers the downloaded metadata files, 
     it will check if an identical metadata entry (with the same pin_id and file_type) already exists in the log list for that pin. 
