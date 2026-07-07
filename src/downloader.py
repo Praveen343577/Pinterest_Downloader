@@ -25,6 +25,7 @@ def download_url(url, callback=None):
     cmd = [
         config.GALLERY_DL_PATH,
         "--cookies", config.COOKIE_FILE,
+        "--download-archive", config.ARCHIVE_FILE,
         "--directory", config.OUTPUT_BASE,
         "-o", "directory=[\".\"]",
         "--filename", template,

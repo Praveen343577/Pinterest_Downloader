@@ -18,6 +18,7 @@ GALLERY_DL_PATH = USER_GALLERY_DL if os.path.exists(USER_GALLERY_DL) else BUNDLE
 
 LINKS_FILE = os.path.join(ROOT_DIR, "Links.txt")
 COOKIE_FILE = os.path.join(ROOT_DIR, "Cookie.txt")
+ARCHIVE_FILE = os.path.join(ROOT_DIR, "DownloadArchive.sqlite3")
 
 TODAY_STR = datetime.datetime.now().strftime("%Y_%m_%d")
 OUTPUT_BASE = os.path.join(ROOT_DIR, "Pinterest", TODAY_STR)
