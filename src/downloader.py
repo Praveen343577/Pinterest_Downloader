@@ -30,7 +30,6 @@ def download_url(url, callback=None):
         "-o", "directory=[\".\"]",
         "--filename", template,
         "--write-metadata",
-        "--no-skip",
         actual_url
     ]
     
@@ -59,7 +58,8 @@ def download_url(url, callback=None):
         line = process.stdout.readline()
         if not line:
             break
-        if line.strip():
+        stripped_line = line.strip()
+        if stripped_line and not stripped_line.startswith('#'):
             items += 1
             if callback:
                 callback(items)
