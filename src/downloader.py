@@ -30,6 +30,7 @@ def download_url(url, callback=None):
         "-o", "directory=[\".\"]",
         "--filename", template,
         "--write-metadata",
+        "--sleep-request", "1-3",
         actual_url
     ]
     

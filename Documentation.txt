@@ -56,6 +56,11 @@ Date : 06-Jul-2026
 Date : 07-Jul-2026
 
 - Now, script keep track of links that are already downloaded links in DownloadArchive.sqlite3 database.
-- If any user tries to download the same link again, the script will skip it and move to the next link.
+    If any user tries to download the same link again, the script will skip it and move to the next link.
 
-- removed --no-skip so that gallery-dl reads DownloadArchive.sqlite3
+- Removed --no-skip so that gallery-dl reads DownloadArchive.sqlite3
+
+- Added the --sleep-request flag of 1-3 seconds to the gallery-dl command in downloader.py.
+    Now, when gallery-dl is extracting pins from a board, 
+    it will pause for a random duration between 1 and 3 seconds between every single HTTP request it makes. 
+    This significantly reduces 10054 Connection Aborted errors by making the script look like normal human browsing to Pinterest's servers.
