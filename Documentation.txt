@@ -19,14 +19,14 @@ Added an indicator Extracting individual pin URLs from boards/profiles... that u
 
 
 
-Date : 06-Jul-2026
+Date : 05-Jul-2026
 
 - Added animated dots at the end of extraction message.
 - Added time elapsed and eta at the end of the extraction.
 
 
 
-Date : 07-Jul-2026
+Date : 06-Jul-2026
 
 - Resolved Major Issue #5.1 [Fix: Pin Duplication during Board Downloads].
 
@@ -50,3 +50,12 @@ Date : 07-Jul-2026
 
 - This means that if a single pin link contains 8 images 
     Log.json will now only contain one clean metadata entry for that link instead of repeating it 8 times.
+
+
+
+Date : 07-Jul-2026
+
+- Now, script keep track of links that are already downloaded links in DownloadArchive.sqlite3 database.
+- If any user tries to download the same link again, the script will skip it and move to the next link.
+
+- removed --no-skip so that gallery-dl reads DownloadArchive.sqlite3
