@@ -25,6 +25,13 @@ class Logger:
         self.log_path = os.path.join(config.LOGS_DIR, self.log_name)
 
     def record(self, result_dict):
+        url = result_dict.get('url')
+        for existing in self.link_details:
+            if existing.get('url') == url:
+                existing.update(result_dict)
+                existing['attempt_count'] = existing.get('attempt_count', 1) + 1
+                return
+        result_dict['attempt_count'] = 1
         self.link_details.append(result_dict)
 
     def write(self):
