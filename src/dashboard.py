@@ -35,6 +35,7 @@ class DashboardManager:
         self.total_start_time = time.time()
         self.durations = []
         self.delay_msg = ""
+        self.pass_num = 1
         
         self.progress = Progress(
             TextColumn("[progress.description]{task.description}"),
@@ -54,7 +55,8 @@ class DashboardManager:
         grid.add_row(self.progress)
         
         trunc_url = self.current_url[:80] + ("..." if len(self.current_url) > 80 else "")
-        grid.add_row(Text(f"Downloading: {trunc_url}", style="dim white"))
+        pass_str = f" (Pass {self.pass_num}/{config.MAX_RETRIES})" if hasattr(self, 'pass_num') and self.pass_num > 1 else ""
+        grid.add_row(Text(f"Downloading{pass_str}: {trunc_url}", style="dim white"))
         
         elapsed = time.time() - self.link_start_time if self.link_start_time else 0
         ips = (self.link_items / elapsed) if elapsed > 0 else 0
@@ -95,7 +97,7 @@ class DashboardManager:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.live.stop()
 
-    def new_link(self, index, url):
+    def new_link(self, index, url, pass_num=1):
         self.current_index = index
         self.current_url = url
         self.link_items = 0
@@ -103,19 +105,30 @@ class DashboardManager:
         self.session_pos = (index // config.SESSION_SIZE) + 1
         self.link_pos = (index % config.SESSION_SIZE) + 1
         self.delay_msg = ""
+        self.pass_num = pass_num
         self.update_display()
 
     def update_item_count(self, count):
         self.link_items = count
         self.update_display()
 
-    def complete_link(self, success, duration):
-        if success:
-            self.success_count += 1
+    def complete_link(self, success, duration, is_retry=False):
+        if is_retry:
+            if success:
+                self.success_count += 1
+                self.fail_count -= 1
         else:
-            self.fail_count += 1
+            if success:
+                self.success_count += 1
+            else:
+                self.fail_count += 1
         self.durations.append(duration)
-        self.progress.update(self.task_id, advance=1, success=self.success_count, fail=self.fail_count)
+        
+        if is_retry:
+            self.progress.update(self.task_id, success=self.success_count, fail=self.fail_count)
+        else:
+            self.progress.update(self.task_id, advance=1, success=self.success_count, fail=self.fail_count)
+            
         self.update_display()
 
     def set_delay(self, remaining):
