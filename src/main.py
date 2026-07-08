@@ -37,35 +37,49 @@ def main():
     start_time = time.time()
     
     with DashboardManager(len(valid_urls)) as dash:
-        for i, url in enumerate(valid_urls):
-            dash.new_link(i, url)
-            
-            def cb(count):
-                dash.update_item_count(count)
+        failed_links = valid_urls.copy()
+        
+        for pass_num in range(1, getattr(config, 'MAX_RETRIES', 3) + 1):
+            if not failed_links:
+                break
                 
-            result = download_url(url, callback=cb)
-            result['extracted_metadata'] = organize_metadata()
-            session_logger.record(result)
+            current_links = failed_links.copy()
+            failed_links = []
+            is_retry = (pass_num > 1)
             
-            success = result['status'] == 'SUCCESS'
-            dash.complete_link(success, result['duration'])
-            dash.print_result(success, result['status'], result['items_downloaded'], url)
-            
-            if i < len(valid_urls) - 1:
-                if (i + 1) % config.SESSION_SIZE == 0:
-                    cooldown_dur = random.uniform(config.MIN_COOLDOWN, config.MAX_COOLDOWN)
-                    elapsed = 0
-                    while elapsed < cooldown_dur:
-                        dash.set_cooldown(cooldown_dur - elapsed, cooldown_dur)
-                        time.sleep(1)
-                        elapsed += 1
-                else:
-                    delay_dur = random.uniform(config.MIN_DELAY, config.MAX_DELAY)
-                    elapsed = 0
-                    while elapsed < delay_dur:
-                        dash.set_delay(delay_dur - elapsed)
-                        time.sleep(0.1)
-                        elapsed += 0.1
+            for i, url in enumerate(current_links):
+                orig_i = valid_urls.index(url)
+                dash.new_link(orig_i, url, pass_num)
+                
+                def cb(count):
+                    dash.update_item_count(count)
+                    
+                result = download_url(url, callback=cb)
+                result['extracted_metadata'] = organize_metadata()
+                session_logger.record(result)
+                
+                success = result['status'] == 'SUCCESS'
+                dash.complete_link(success, result['duration'], is_retry)
+                dash.print_result(success, result['status'], result['items_downloaded'], url)
+                
+                if not success:
+                    failed_links.append(url)
+                
+                if i < len(current_links) - 1:
+                    if (orig_i + 1) % config.SESSION_SIZE == 0:
+                        cooldown_dur = random.uniform(config.MIN_COOLDOWN, config.MAX_COOLDOWN)
+                        elapsed = 0
+                        while elapsed < cooldown_dur:
+                            dash.set_cooldown(cooldown_dur - elapsed, cooldown_dur)
+                            time.sleep(1)
+                            elapsed += 1
+                    else:
+                        delay_dur = random.uniform(config.MIN_DELAY, config.MAX_DELAY)
+                        elapsed = 0
+                        while elapsed < delay_dur:
+                            dash.set_delay(delay_dur - elapsed)
+                            time.sleep(0.1)
+                            elapsed += 0.1
 
     session_logger.write()
     print_summary(time.time() - start_time, session_logger.success_count if hasattr(session_logger, 'success_count') else sum(1 for d in session_logger.link_details if d['status'] == 'SUCCESS'), sum(1 for d in session_logger.link_details if d['status'] != 'SUCCESS' and d['status'] != 'INVALID_URL'))
