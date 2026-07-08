@@ -64,3 +64,9 @@ Date : 07-Jul-2026
     Now, when gallery-dl is extracting pins from a board, 
     it will pause for a random duration between 1 and 3 seconds between every single HTTP request it makes. 
     This significantly reduces 10054 Connection Aborted errors by making the script look like normal human browsing to Pinterest's servers.
+
+
+
+Date : 08-Jul-2026
+
+- Added retry logic for failed links.
