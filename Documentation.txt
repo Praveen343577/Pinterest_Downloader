@@ -70,3 +70,18 @@ Date : 07-Jul-2026
 Date : 08-Jul-2026
 
 - Added retry logic for failed links.
+    - Added MAX_RETRIES = 3 to config.py. The script will now attempt to download failed links up to a maximum of 3 times per session (1 initial attempt + 2 retries).
+
+- Main Loop Orchestration
+    - Rewrote the main loop in main.py. The script now completes a full "Pass 1" of all links.
+    - If any links fail, it automatically starts a "Pass 2" containing only the failed links.
+    - It continues this process until all links succeed or MAX_RETRIES is reached.
+
+- Dashboard UI
+    - Updated the Rich dashboard to display the current pass (e.g., Downloading (Pass 2/3): url...).
+    - When a link fails on Pass 1, it marks a failure. If it subsequently succeeds on Pass 2, the UI automatically reverses that failure count and adds it to the success count, keeping the progress bar perfectly accurate.
+
+- Smart Logging
+    - Updated logger.py to prevent duplicate log entries for the same link.
+    - Instead of adding a new entry every time a link is retried, the logger now finds the existing entry for that URL and updates it with the final status and total duration.
+    - Added an attempt_count field to Log.json so you can see exactly how many times a link had to be retried before it succeeded or ultimately failed.
