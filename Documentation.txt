@@ -85,3 +85,10 @@ Date : 08-Jul-2026
     - Updated logger.py to prevent duplicate log entries for the same link.
     - Instead of adding a new entry every time a link is retried, the logger now finds the existing entry for that URL and updates it with the final status and total duration.
     - Added an attempt_count field to Log.json so you can see exactly how many times a link had to be retried before it succeeded or ultimately failed.
+
+- Exact behavior
+    - Pass 1 (The Main Run): The script reads every link in Links.txt file (let's say 120 links) and starts downloading them sequentially.
+    - Cooldown Sessions: As it works through those 120 links, it will still take its long break (the MIN_COOLDOWN / SESSION_SIZE) every 50 links, just like before.
+    - End of Pass 1: Once it finishes attempting all 120 links, Pass 1 is completely finished.
+    - Pass 2 (Retry 1): Only after all 120 links are done, it gathers any links that failed (let's say 5 of them failed). It immediately starts Pass 2 and tries to download just those 5 links.
+    - Pass 3 (Retry 2): If 2 of those 5 links fail again, it will start Pass 3 and try those 2 links one last time.
