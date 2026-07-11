@@ -42,6 +42,7 @@ def parse_links():
     invalid_urls = []
     
     pattern = re.compile(r'^https?://(?:.*pinterest\.(com|co\.uk|ca|fr|de|es|it|at|be|ch|se|dk|pt|nz|ph|ru|jp|kr|com\.au|com\.mx|com\.br)|pin\.it).*')
+    pin_pattern = re.compile(r'/pin/\d+')
     
     raw_valid = []
     with open(config.LINKS_FILE, 'r', encoding='utf-8') as f:
@@ -55,19 +56,29 @@ def parse_links():
                 invalid_urls.append((i, line))
                 
     if raw_valid:
-        with Progress(
-            TextColumn("[yellow]Extracting individual pin URLs from boards/profiles[/yellow]"),
-            SpinnerColumn("my_dots", style="yellow"),
-            TextColumn(" | [cyan]Elapsed:[/cyan]"),
-            TimeElapsedColumn(),
-            TextColumn(" | [cyan]ETA:[/cyan]"),
-            TimeRemainingColumn(),
-            console=console
-        ) as progress:
-            task = progress.add_task("", total=len(raw_valid))
-            for url in raw_valid:
-                valid_urls.extend(expand_url(url))
-                progress.update(task, advance=1)
+        needs_expansion = [u for u in raw_valid if not pin_pattern.search(u)]
+        expanded_map = {}
+        
+        if needs_expansion:
+            with Progress(
+                TextColumn("[yellow]Extracting individual pin URLs from boards/profiles[/yellow]"),
+                SpinnerColumn("my_dots", style="yellow"),
+                TextColumn(" | [cyan]Elapsed:[/cyan]"),
+                TimeElapsedColumn(),
+                TextColumn(" | [cyan]ETA:[/cyan]"),
+                TimeRemainingColumn(),
+                console=console
+            ) as progress:
+                task = progress.add_task("", total=len(needs_expansion))
+                for url in needs_expansion:
+                    expanded_map[url] = expand_url(url)
+                    progress.update(task, advance=1)
+                    
+        for url in raw_valid:
+            if pin_pattern.search(url):
+                valid_urls.append(url)
+            else:
+                valid_urls.extend(expanded_map[url])
                 
     # Remove duplicates globally while preserving order
     valid_urls = list(dict.fromkeys(valid_urls))
