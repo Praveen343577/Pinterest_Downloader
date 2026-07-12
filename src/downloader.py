@@ -82,7 +82,10 @@ def download_url(url, callback=None):
     rc = process.returncode
     
     if rc == 0:
-        status = "SUCCESS"
+        if items == 0:
+            status = "EXISTS"
+        else:
+            status = "SUCCESS"
         error_message = None
     else:
         stderr_lower = stderr.lower()

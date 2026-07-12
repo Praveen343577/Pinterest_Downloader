@@ -43,6 +43,9 @@ def main():
             if not failed_links:
                 break
                 
+            if pass_num > 1:
+                dash.add_line_space()
+                
             current_links = failed_links.copy()
             failed_links = []
             is_retry = (pass_num > 1)
@@ -58,9 +61,10 @@ def main():
                 result['extracted_metadata'] = organize_metadata()
                 session_logger.record(result)
                 
-                success = result['status'] == 'SUCCESS'
-                dash.complete_link(success, result['duration'], is_retry)
-                dash.print_result(success, result['status'], result['items_downloaded'], url)
+                status = result['status']
+                success = status in ['SUCCESS', 'EXISTS']
+                dash.complete_link(status, result['duration'], is_retry)
+                dash.print_result(status, result['items_downloaded'], url)
                 
                 if not success:
                     failed_links.append(url)
@@ -82,7 +86,7 @@ def main():
                             elapsed += 0.1
 
     session_logger.write()
-    print_summary(time.time() - start_time, session_logger.success_count if hasattr(session_logger, 'success_count') else sum(1 for d in session_logger.link_details if d['status'] == 'SUCCESS'), sum(1 for d in session_logger.link_details if d['status'] != 'SUCCESS' and d['status'] != 'INVALID_URL'))
+    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count)
     # dash.flush_results()
 
 if __name__ == "__main__":
