@@ -3,6 +3,7 @@ import config
 import subprocess
 from rich.console import Console
 from rich.progress import Progress, TextColumn, TimeElapsedColumn, TimeRemainingColumn, SpinnerColumn
+# from rich.text import Text
 import rich._spinners
 
 rich._spinners.SPINNERS["my_dots"] = {
@@ -11,6 +12,25 @@ rich._spinners.SPINNERS["my_dots"] = {
 }
 
 console = Console()
+
+# class CustomTimeElapsedColumn(TimeElapsedColumn):
+#     def render(self, task):
+#         elapsed = task.finished_time if task.finished else task.elapsed
+#         if elapsed is None:
+#             return Text("--:--:--", style="progress.elapsed")
+#         elapsed = int(elapsed)
+#         m, s = divmod(elapsed, 60)
+#         h, m = divmod(m, 60)
+#         return Text(f"{h:02d}:{m:02d}:{s:02d}", style="progress.elapsed")
+
+# class CustomTimeRemainingColumn(TimeRemainingColumn):
+#     def render(self, task):
+#         if task.time_remaining is None:
+#             return Text("--:--:--", style="progress.remaining")
+#         time_remaining = int(task.time_remaining)
+#         m, s = divmod(time_remaining, 60)
+#         h, m = divmod(m, 60)
+#         return Text(f"{h:02d}:{m:02d}:{s:02d}", style="progress.remaining")
 
 def expand_url(url):
     cmd = [
@@ -65,8 +85,10 @@ def parse_links():
                 SpinnerColumn("my_dots", style="yellow"),
                 TextColumn(" | [cyan]Elapsed:[/cyan]"),
                 TimeElapsedColumn(),
+                # CustomTimeElapsedColumn(),
                 TextColumn(" | [cyan]ETA:[/cyan]"),
                 TimeRemainingColumn(),
+                # CustomTimeRemainingColumn(),
                 console=console
             ) as progress:
                 task = progress.add_task("", total=len(needs_expansion))
