@@ -57,12 +57,14 @@ class DashboardManager:
         
         trunc_url = self.current_url[:80] + ("..." if len(self.current_url) > 80 else "")
         pass_str = f" (Pass {self.pass_num}/{config.MAX_RETRIES})" if hasattr(self, 'pass_num') and self.pass_num > 1 else ""
-        grid.add_row(Text(f"Downloading{pass_str}: {trunc_url}", style="dim white"))
+        grid.add_row(Text(f"Downloading{pass_str}: {trunc_url}", style="yellow"))
+        
+        grid.add_row("")
         
         elapsed = time.time() - self.link_start_time if self.link_start_time else 0
         ips = (self.link_items / elapsed) if elapsed > 0 else 0
         stats_str = f"DL: {self.link_items} items | {int(elapsed//60):02d}:{int(elapsed%60):02d} | {ips:.1f} items/sec | Session {self.session_pos} - Link {self.link_pos} / {config.SESSION_SIZE}"
-        grid.add_row(Text(stats_str, style="cyan"))
+        grid.add_row(Text(stats_str, style="magenta"))
         
         total_elapsed = time.time() - self.total_start_time
         if self.durations:
