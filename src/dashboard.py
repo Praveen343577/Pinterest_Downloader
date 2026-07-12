@@ -18,8 +18,8 @@ def print_header(total_links, log_name):
 def print_preflight_success(msg):
     console.print(f"{msg}\n")
 
-def print_summary(total_time, success, failed, exists):
-    console.print(f"\nExecution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed} | exists: {exists}\n")
+def print_summary(total_time, success, failed, exists, empty):
+    console.print(f"\nExecution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed} | exists: {exists} | empty: {empty}\n")
 
 class DashboardManager:
     def __init__(self, total_links):
@@ -28,6 +28,7 @@ class DashboardManager:
         self.success_count = 0
         self.fail_count = 0
         self.exists_count = 0
+        self.empty_count = 0
         self.current_url = ""
         self.link_items = 0
         self.link_start_time = 0
@@ -43,9 +44,9 @@ class DashboardManager:
             BarColumn(),
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TextColumn("{task.completed} / {task.total} links"),
-            TextColumn("[green][SUCCESS : {task.fields[success]}][/green] [red][FAILED : {task.fields[fail]}][/red] [blue][EXISTS : {task.fields[exists]}][/blue]")
+            TextColumn("[green][SUCCESS : {task.fields[success]}][/green] [red][FAILED : {task.fields[fail]}][/red] [blue][EXISTS : {task.fields[exists]}][/blue] [yellow][EMPTY : {task.fields[empty]}][/yellow]")
         )
-        self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0, exists=0)
+        self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0, exists=0, empty=0)
         self.live = Live(self.progress, console=console, refresh_per_second=4)
         self.results_log = []
 
@@ -123,19 +124,24 @@ class DashboardManager:
             elif status == "EXISTS":
                 self.exists_count += 1
                 self.fail_count -= 1
+            elif status == "EMPTY":
+                self.empty_count += 1
+                self.fail_count -= 1
         else:
             if status == "SUCCESS":
                 self.success_count += 1
             elif status == "EXISTS":
                 self.exists_count += 1
+            elif status == "EMPTY":
+                self.empty_count += 1
             else:
                 self.fail_count += 1
         self.durations.append(duration)
         
         if is_retry:
-            self.progress.update(self.task_id, success=self.success_count, fail=self.fail_count, exists=self.exists_count)
+            self.progress.update(self.task_id, success=self.success_count, fail=self.fail_count, exists=self.exists_count, empty=self.empty_count)
         else:
-            self.progress.update(self.task_id, advance=1, success=self.success_count, fail=self.fail_count, exists=self.exists_count)
+            self.progress.update(self.task_id, advance=1, success=self.success_count, fail=self.fail_count, exists=self.exists_count, empty=self.empty_count)
             
         self.update_display()
 
@@ -153,6 +159,8 @@ class DashboardManager:
             status_text = f"[green]{status:<10}[/green]"
         elif status == "EXISTS":
             status_text = f"[blue]{status:<10}[/blue]"
+        elif status == "EMPTY":
+            status_text = f"[yellow]{status:<10}[/yellow]"
         else:
             status_text = f"[red]{status:<10}[/red]"
         self.results_log.append(f"{status_text} [{items}] {trunc_url}")

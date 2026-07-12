@@ -55,15 +55,19 @@ def download_url(url, callback=None):
         }
 
     items = 0
+    skipped_items = 0
     while True:
         line = process.stdout.readline()
         if not line:
             break
         stripped_line = line.strip()
-        if stripped_line and not stripped_line.startswith('#'):
-            items += 1
-            if callback:
-                callback(items)
+        if stripped_line:
+            if stripped_line.startswith('#'):
+                skipped_items += 1
+            else:
+                items += 1
+                if callback:
+                    callback(items)
                 
     try:
         process.wait(timeout=config.TIMEOUT_SEC)
@@ -82,10 +86,12 @@ def download_url(url, callback=None):
     rc = process.returncode
     
     if rc == 0:
-        if items == 0:
+        if items > 0:
+            status = "SUCCESS"
+        elif skipped_items > 0:
             status = "EXISTS"
         else:
-            status = "SUCCESS"
+            status = "EMPTY"
         error_message = None
     else:
         stderr_lower = stderr.lower()

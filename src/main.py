@@ -62,7 +62,7 @@ def main():
                 session_logger.record(result)
                 
                 status = result['status']
-                success = status in ['SUCCESS', 'EXISTS']
+                success = status in ['SUCCESS', 'EXISTS', 'EMPTY']
                 dash.complete_link(status, result['duration'], is_retry)
                 dash.print_result(status, result['items_downloaded'], url)
                 
@@ -86,7 +86,7 @@ def main():
                             elapsed += 0.1
 
     session_logger.write()
-    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count)
+    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count, dash.empty_count)
     # dash.flush_results()
 
 if __name__ == "__main__":
