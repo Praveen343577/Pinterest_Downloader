@@ -110,3 +110,17 @@ Date : 11-Jul-2026
 
 
 Date : 12-Jul-2026
+
+- Updated the terminal dashboard
+
+- Added line spaces between passes
+    - Updated src/main.py and src/dashboard.py to insert an empty line into the log output before retrying failed links.
+- Color-coded output status
+    - Modified src/dashboard.py to format SUCCESS in green, EXISTS in blue, and FAILED in red.
+- Track EXISTS accurately
+    - Updated src/downloader.py to detect when a download process is successful but downloads 0 items, marking it as EXISTS instead of a regular SUCCESS.
+- Added line spacing
+    - There is now a blank line separating the Downloading: ... row from the stats row (DL: ...).
+- Updated colors
+    - Replaced the bluish color (cyan) that was being used for the download stats row with magenta, which matches the default color rich uses for the 100% text in the progress bar. 
+    - Now, green, red, and blue are exclusively reserved for marking SUCCESS, FAILED, and EXISTS statuses respectively.
