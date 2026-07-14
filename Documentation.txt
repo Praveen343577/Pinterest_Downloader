@@ -133,3 +133,25 @@ Date : 14-Jul-2026
     - The script now specifically flags 404 Not Found errors from gallery-dl as DEADLINK instead of a generic FAILED.
     - Updated the retry logic so it will completely ignore DEADLINKs instead of wasting time retrying them.
     - Added the new category to the progress bar, stats line, and summary with the requested bright grey ([bright_black]) color styling.
+
+- All categories definition and purpose
+
+    - SUCCESS
+        - Definition: The script successfully connected to a valid link and extracted new media files.
+        - Purpose: Tracks brand-new media items downloaded to your local storage during the current session, ensuring that only net-new additions contribute to the success count.
+        
+    - EXISTS
+        - Definition: The link is valid and contains media, but all media was already previously downloaded.
+        - Purpose: Prevents duplicate files by skipping already-archived pins, saving time and bandwidth while keeping the success count strictly for new downloads.
+    
+    - EMPTY
+        - Definition: The link is accessible but currently contains zero media (e.g., an empty Pinterest board).
+        - Purpose: Differentiates a completely empty but valid page from an error, so you know the script worked correctly but there was simply nothing to grab.
+    
+    - FAILED
+        - Definition: An unexpected error occurred preventing access or download (e.g., connection timeout, blocked IP).
+        - Purpose: Highlights transient or network-level errors that warrant a retry on subsequent passes, ensuring no media is skipped due to a temporary hiccup.
+    
+    - DEADLINK
+        - Definition: The requested pin or board was permanently deleted or removed by the creator (404 Not Found).
+        - Purpose: Identifies permanently dead links so the script can immediately discard them, saving time by intentionally excluding them from any retry attempts.
