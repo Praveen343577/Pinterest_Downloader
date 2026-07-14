@@ -124,3 +124,12 @@ Date : 12-Jul-2026
 - Updated colors
     - Replaced the bluish color (cyan) that was being used for the download stats row with magenta, which matches the default color rich uses for the 100% text in the progress bar. 
     - Now, green, red, and blue are exclusively reserved for marking SUCCESS, FAILED, and EXISTS statuses respectively.
+
+
+
+Date : 14-Jul-2026
+
+- Added DEADLINK category
+    - The script now specifically flags 404 Not Found errors from gallery-dl as DEADLINK instead of a generic FAILED.
+    - Updated the retry logic so it will completely ignore DEADLINKs instead of wasting time retrying them.
+    - Added the new category to the progress bar, stats line, and summary with the requested bright grey ([bright_black]) color styling.
