@@ -55,7 +55,7 @@ class DashboardManager:
         
         grid.add_row(self.progress)
         
-        stats_line = Text.from_markup(f"[green][SUCCESS : {self.success_count}][/green] [red][FAILED : {self.fail_count}][/red] [blue][EXISTS : {self.exists_count}][/blue] [dark_orange][EMPTY : {self.empty_count}][/dark_orange]")
+        stats_line = Text.from_markup(f"[green][SUCCESS : {self.success_count}][/green] [red][FAILED : {self.fail_count}][/red] [blue][EXISTS : {self.exists_count}][/blue] [cyan][EMPTY : {self.empty_count}][/cyan]")
         grid.add_row(stats_line)
         grid.add_row("")
         
@@ -163,7 +163,7 @@ class DashboardManager:
         elif status == "EXISTS":
             status_text = f"[blue]{status:<10}[/blue]"
         elif status == "EMPTY":
-            status_text = f"[dark_orange]{status:<10}[/dark_orange]"
+            status_text = f"[cyan]{status:<10}[/cyan]"
         else:
             status_text = f"[red]{status:<10}[/red]"
         self.results_log.append(f"{status_text} [{items}] {trunc_url}")
