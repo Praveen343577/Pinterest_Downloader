@@ -66,7 +66,7 @@ def main():
                 dash.complete_link(status, result['duration'], is_retry)
                 dash.print_result(status, result['items_downloaded'], url)
                 
-                if not success:
+                if not success and status != 'DEADLINK':
                     failed_links.append(url)
                 
                 if i < len(current_links) - 1:
@@ -86,7 +86,7 @@ def main():
                             elapsed += 0.1
 
     session_logger.write()
-    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count, dash.empty_count)
+    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count, dash.empty_count, dash.deadlink_count)
     # dash.flush_results()
 
 if __name__ == "__main__":
