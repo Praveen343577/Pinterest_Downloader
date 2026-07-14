@@ -124,3 +124,7 @@ Date : 12-Jul-2026
 - Updated colors
     - Replaced the bluish color (cyan) that was being used for the download stats row with magenta, which matches the default color rich uses for the 100% text in the progress bar. 
     - Now, green, red, and blue are exclusively reserved for marking SUCCESS, FAILED, and EXISTS statuses respectively.
+
+
+
+Date : 14-Jul-2026

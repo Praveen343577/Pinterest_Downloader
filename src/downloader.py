@@ -97,8 +97,8 @@ def download_url(url, callback=None):
         stderr_lower = stderr.lower()
         if "403" in stderr_lower or "forbidden" in stderr_lower:
             status = "HTTP_403"
-        elif "404" in stderr_lower or "not found" in stderr_lower:
-            status = "HTTP_404"
+        elif "404" in stderr_lower or "not found" in stderr_lower or "notfound" in stderr_lower or "not be found" in stderr_lower:
+            status = "DEADLINK"
         else:
             status = "FAILED"
         error_message = stderr.strip() if stderr.strip() else f"Process exited with code {rc}"
