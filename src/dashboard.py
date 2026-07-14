@@ -43,8 +43,7 @@ class DashboardManager:
             TextColumn("[progress.description]{task.description}"),
             BarColumn(),
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            TextColumn("{task.completed} / {task.total} links"),
-            TextColumn("[green][SUCCESS : {task.fields[success]}][/green] [red][FAILED : {task.fields[fail]}][/red] [blue][EXISTS : {task.fields[exists]}][/blue] [yellow][EMPTY : {task.fields[empty]}][/yellow]")
+            TextColumn("{task.completed} / {task.total} links")
         )
         self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0, exists=0, empty=0)
         self.live = Live(self.progress, console=console, refresh_per_second=4)
@@ -55,6 +54,10 @@ class DashboardManager:
         grid.add_column()
         
         grid.add_row(self.progress)
+        
+        stats_line = Text.from_markup(f"[green][SUCCESS : {self.success_count}][/green] [red][FAILED : {self.fail_count}][/red] [blue][EXISTS : {self.exists_count}][/blue] [dark_orange][EMPTY : {self.empty_count}][/dark_orange]")
+        grid.add_row(stats_line)
+        grid.add_row("")
         
         trunc_url = self.current_url[:80] + ("..." if len(self.current_url) > 80 else "")
         pass_str = f" (Pass {self.pass_num}/{config.MAX_RETRIES})" if hasattr(self, 'pass_num') and self.pass_num > 1 else ""
@@ -160,7 +163,7 @@ class DashboardManager:
         elif status == "EXISTS":
             status_text = f"[blue]{status:<10}[/blue]"
         elif status == "EMPTY":
-            status_text = f"[yellow]{status:<10}[/yellow]"
+            status_text = f"[dark_orange]{status:<10}[/dark_orange]"
         else:
             status_text = f"[red]{status:<10}[/red]"
         self.results_log.append(f"{status_text} [{items}] {trunc_url}")
