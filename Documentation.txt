@@ -155,3 +155,23 @@ Date : 14-Jul-2026
     - DEADLINK
         - Definition: The requested pin or board was permanently deleted or removed by the creator (404 Not Found).
         - Purpose: Identifies permanently dead links so the script can immediately discard them, saving time by intentionally excluding them from any retry attempts.
+
+
+
+Date : 16-Jul-2026
+
+- Fixed multiple metadata files download for pins that contains multiple media.
+
+- By default, the gallery-dl tool writes metadata for every single file it downloads. If a single Pinterest pin contains a carousel of 5 images, 
+    gallery-dl generates 5 separate images and 5 corresponding JSON metadata files.
+
+- Previously, the organizer.py script was iterating through all of these JSON files, 
+    renaming them to match the media file names and moving them into the Metadata folder.
+    This is why you saw duplicate metadata files for pins with multiple media.
+
+- The fix:
+    - Modified the metadata organizing logic to keep track of processed pins using their unique pin_id. 
+        Now, when iterating through the generated .json files, the script only keeps the first JSON file it encounters for a specific pin.
+        It then automatically deletes any duplicate metadata files for the same pin.
+    - To clearly reflect that the metadata belongs to the pin (and not to a single media file), metadata files will be saved as [account_name] [pin_id].json (e.g., uiuxbunker 606086062398772114.json).
+        This ensures one unique file per pin and prevents any naming conflicts.
