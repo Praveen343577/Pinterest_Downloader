@@ -75,7 +75,7 @@ def organize_metadata():
                 
             if pin_id and pin_id not in processed_pin_ids:
                 processed_pin_ids.add(pin_id)
-                new_json_filename = f"{account_name}_{pin_id}.json"
+                new_json_filename = f"{account_name} {pin_id}.json"
                 dst_json_path = os.path.join(config.METADATA_DIR, new_json_filename)
                 shutil.move(json_path, dst_json_path)
             else:
