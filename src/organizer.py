@@ -5,6 +5,7 @@ import config
 
 def organize_metadata():
     extracted_metadata = []
+    processed_pin_ids = set()
     for filename in os.listdir(config.OUTPUT_BASE):
         if filename.endswith(".json"):
             json_path = os.path.join(config.OUTPUT_BASE, filename)
@@ -40,8 +41,9 @@ def organize_metadata():
 
             ext = media_filename.split('.')[-1].lower() if '.' in media_filename else 'unknown'
             
+            pin_id = data.get("id")
             new_entry = {
-                "pin_id": data.get("id"),
+                "pin_id": pin_id,
                 "username": full_name,
                 "account_name": account_name,
                 "board_name": board.get("name"),
@@ -68,12 +70,18 @@ def organize_metadata():
                 new_media_filename = f"{new_base_name}.{ext}"
                 new_media_path = os.path.join(config.OUTPUT_BASE, new_media_filename)
                 
-            new_json_filename = f"{new_base_name}.{ext}.json"
-            
             if os.path.exists(media_path):
                 os.rename(media_path, new_media_path)
                 
-            dst_json_path = os.path.join(config.METADATA_DIR, new_json_filename)
-            shutil.move(json_path, dst_json_path)
+            if pin_id and pin_id not in processed_pin_ids:
+                processed_pin_ids.add(pin_id)
+                new_json_filename = f"{account_name}_{pin_id}.json"
+                dst_json_path = os.path.join(config.METADATA_DIR, new_json_filename)
+                shutil.move(json_path, dst_json_path)
+            else:
+                try:
+                    os.remove(json_path)
+                except OSError:
+                    pass
             
     return extracted_metadata
