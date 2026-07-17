@@ -175,3 +175,12 @@ Date : 16-Jul-2026
         It then automatically deletes any duplicate metadata files for the same pin.
     - To clearly reflect that the metadata belongs to the pin (and not to a single media file), metadata files will be saved as [account_name] [pin_id].json (e.g., uiuxbunker 606086062398772114.json).
         This ensures one unique file per pin and prevents any naming conflicts.
+
+
+Date : 17-Jul-2026
+
+- Fixing an issue where script misses video media in Pinterest carousel (mixed-media) pins. 
+    A known bug in gallery-dl causes it to only download images for these types of pins. 
+    
+- The solution uses the metadata gallery-dl extracts.
+    Parse this JSON to find the hidden video URLs and download them manually, avoiding the need for heavy secondary dependencies like yt-dlp.
