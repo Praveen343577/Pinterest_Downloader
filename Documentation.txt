@@ -206,3 +206,31 @@ Date : 18-Jul-2026
    - Adds `extra_videos` to the `items_downloaded` count. 
    - This ensures that when the terminal dashboard prints the `[SUCCESS] [X]` final line, 
       the number accurately reflects both the images `gallery-dl` found PLUS any videos our script rescued from the carousel.
+
+
+
+Date : 19-Jul-2026
+
+- Prevent duplicate entries in `extracted_metadata` for pins containing mixed media.
+    
+    - Currently, the script checks if `new_entry` is not in `extracted_metadata`. 
+    - Since `new_entry` includes a `"file_type"` key, an image (`jpg`) and a video (`mp4`) from the same pin will have different `new_entry` dictionaries. 
+    - Thus, both are logged.
+    
+    - Solution: 
+        - Changed the conditional check to search `extracted_metadata` for an existing entry with the same `pin_id`. 
+        - To ensure no information is omitted (as requested), `"file_type"` will be initialized as a list (e.g., `["jpg"]`). 
+        - If the `pin_id` already exists in `extracted_metadata`, the script will simply append the new file extension to the existing entry's `"file_type"` list if it's not already present (e.g., resulting in `["jpg", "mp4"]`).
+
+
+- Fix the file renaming bug where missing carousel videos were retaining their raw ID instead of matching the uniform naming scheme (e.g., `account_name v1.mp4`).
+    
+    - When the script downloads missing carousel videos in the pre-pass, it currently creates `video_id.mp4` and `video_id.json`. 
+    - In the second pass, the script strips `.json` expecting to find the media file name. 
+    - Since it strips `.json` from `video_id.json`, it looks for a media file named `video_id` (without the extension). 
+    - Because `video_id` does not exist on disk (the file is `video_id.mp4`), the rename operation is skipped.
+    
+    - Solution: 
+        - Change the synthetic JSON generation to include the `.mp4` extension. 
+        - By saving it as `video_id.mp4.json`, the second pass will correctly identify the media file as `video_id.mp4` 
+        - successfully renaming it as `account_name v1.mp4`.
