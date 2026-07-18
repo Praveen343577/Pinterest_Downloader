@@ -56,7 +56,7 @@ def organize_metadata():
                             with open(media_path, 'wb') as vf:
                                 vf.write(video_data)
                                 
-                            synthetic_json_path = os.path.join(config.OUTPUT_BASE, f"{video_id}.json")
+                            synthetic_json_path = os.path.join(config.OUTPUT_BASE, f"{video_id}.mp4.json")
                             with open(synthetic_json_path, 'w', encoding='utf-8') as sjf:
                                 json.dump(data, sjf)
                                 
@@ -109,11 +109,16 @@ def organize_metadata():
                 "board_url": board.get("url"),
                 "title": data.get("grid_title") or data.get("title") or data.get("seo_title"),
                 "description": data.get("description") or data.get("closeup_description"),
-                "file_type": ext,
+                "file_type": [ext],
                 "repin_count": data.get("repin_count"),
                 "created_at": data.get("created_at")
             }
-            if new_entry not in extracted_metadata:
+            
+            existing_entry = next((entry for entry in extracted_metadata if entry.get("pin_id") == pin_id), None)
+            if existing_entry:
+                if ext not in existing_entry["file_type"]:
+                    existing_entry["file_type"].append(ext)
+            else:
                 extracted_metadata.append(new_entry)
 
             type_prefix = 'v' if ext in ['mp4', 'webm', 'mov', 'm4v', 'avi'] else 'p'
