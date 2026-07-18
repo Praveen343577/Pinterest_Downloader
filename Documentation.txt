@@ -19,10 +19,14 @@ Added an indicator Extracting individual pin URLs from boards/profiles... that u
 
 
 
+
+
 Date : 05-Jul-2026
 
 - Added animated dots at the end of extraction message.
 - Added time elapsed and eta at the end of the extraction.
+
+
 
 
 
@@ -53,6 +57,8 @@ Date : 06-Jul-2026
 
 
 
+
+
 Date : 07-Jul-2026
 
 - Now, script keep track of links that are already downloaded links in DownloadArchive.sqlite3 database.
@@ -64,6 +70,8 @@ Date : 07-Jul-2026
     Now, when gallery-dl is extracting pins from a board, 
     it will pause for a random duration between 1 and 3 seconds between every single HTTP request it makes. 
     This significantly reduces 10054 Connection Aborted errors by making the script look like normal human browsing to Pinterest's servers.
+
+
 
 
 
@@ -95,6 +103,8 @@ Date : 08-Jul-2026
 
 
 
+
+
 Date : 11-Jul-2026
 
 - Smart Link Detection
@@ -106,6 +116,8 @@ Date : 11-Jul-2026
     - If Links.txt file contains only direct pins, script will instantly start the download session with zero delay.
 - Order Preservation
     - Despite splitting the links into two different processing queues internally, script ensures the logic automatically recombines them so the final download order perfectly matches the original order in Links.txt file.
+
+
 
 
 
@@ -124,6 +136,8 @@ Date : 12-Jul-2026
 - Updated colors
     - Replaced the bluish color (cyan) that was being used for the download stats row with magenta, which matches the default color rich uses for the 100% text in the progress bar. 
     - Now, green, red, and blue are exclusively reserved for marking SUCCESS, FAILED, and EXISTS statuses respectively.
+
+
 
 
 
@@ -158,6 +172,8 @@ Date : 14-Jul-2026
 
 
 
+
+
 Date : 16-Jul-2026
 
 - Fixed multiple metadata files download for pins that contains multiple media.
@@ -178,6 +194,8 @@ Date : 16-Jul-2026
 
 
 
+
+
 Date : 17-Jul-2026
 
 - Fixing an issue where script misses video media in Pinterest carousel (mixed-media) pins. 
@@ -185,6 +203,8 @@ Date : 17-Jul-2026
     
 - The solution uses the metadata gallery-dl extracts.
     Parse this JSON to find the hidden video URLs and download them manually, avoiding the need for heavy secondary dependencies like yt-dlp.
+
+
 
 
 
@@ -206,6 +226,8 @@ Date : 18-Jul-2026
    - Adds `extra_videos` to the `items_downloaded` count. 
    - This ensures that when the terminal dashboard prints the `[SUCCESS] [X]` final line, 
       the number accurately reflects both the images `gallery-dl` found PLUS any videos our script rescued from the carousel.
+
+
 
 
 
