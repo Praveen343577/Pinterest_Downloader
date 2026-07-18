@@ -58,7 +58,9 @@ def main():
                     dash.update_item_count(count)
                     
                 result = download_url(url, callback=cb)
-                result['extracted_metadata'] = organize_metadata()
+                extracted_metadata, extra_videos = organize_metadata()
+                result['extracted_metadata'] = extracted_metadata
+                result['items_downloaded'] += extra_videos
                 session_logger.record(result)
                 
                 status = result['status']

@@ -1,11 +1,70 @@
 import os
 import shutil
 import json
+import urllib.request
 import config
 
 def organize_metadata():
     extracted_metadata = []
     processed_pin_ids = set()
+    extra_videos_downloaded = 0
+    downloaded_video_ids = set()
+    
+    # Pre-pass: Find and download missing carousel videos
+    json_files = [f for f in os.listdir(config.OUTPUT_BASE) if f.endswith(".json")]
+    for filename in json_files:
+        json_path = os.path.join(config.OUTPUT_BASE, filename)
+        if not os.path.isfile(json_path):
+            continue
+            
+        with open(json_path, 'r', encoding='utf-8') as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                continue
+                
+        carousel_data = data.get("carousel_data")
+        if carousel_data and isinstance(carousel_data, dict):
+            slots = carousel_data.get("carousel_slots", [])
+            for slot in slots:
+                videos = slot.get("videos")
+                if videos and isinstance(videos, dict):
+                    video_id = videos.get("id") or videos.get("node_id")
+                    if not video_id or video_id in downloaded_video_ids:
+                        continue
+                    
+                    video_list = videos.get("video_list", {})
+                    video_url = None
+                    for qual in ["V_720P", "V_1080P", "V_480P", "V_HLSV4", "V_HLSV3_MOBILE"]:
+                        v_obj = video_list.get(qual)
+                        if v_obj and v_obj.get("url"):
+                            url = v_obj.get("url")
+                            if url.endswith(".mp4"):
+                                video_url = url
+                                break
+                            elif not video_url: 
+                                video_url = url
+                                
+                    if video_url:
+                        try:
+                            req = urllib.request.Request(video_url, headers={'User-Agent': 'Mozilla/5.0'})
+                            with urllib.request.urlopen(req, timeout=15) as response:
+                                video_data = response.read()
+                            
+                            media_filename = f"{video_id}.mp4"
+                            media_path = os.path.join(config.OUTPUT_BASE, media_filename)
+                            with open(media_path, 'wb') as vf:
+                                vf.write(video_data)
+                                
+                            synthetic_json_path = os.path.join(config.OUTPUT_BASE, f"{video_id}.json")
+                            with open(synthetic_json_path, 'w', encoding='utf-8') as sjf:
+                                json.dump(data, sjf)
+                                
+                            downloaded_video_ids.add(video_id)
+                            extra_videos_downloaded += 1
+                        except Exception:
+                            pass
+
     for filename in os.listdir(config.OUTPUT_BASE):
         if filename.endswith(".json"):
             json_path = os.path.join(config.OUTPUT_BASE, filename)
@@ -84,4 +143,4 @@ def organize_metadata():
                 except OSError:
                     pass
             
-    return extracted_metadata
+    return extracted_metadata, extra_videos_downloaded
