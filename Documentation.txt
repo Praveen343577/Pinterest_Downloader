@@ -177,6 +177,7 @@ Date : 16-Jul-2026
         This ensures one unique file per pin and prevents any naming conflicts.
 
 
+
 Date : 17-Jul-2026
 
 - Fixing an issue where script misses video media in Pinterest carousel (mixed-media) pins. 
@@ -184,3 +185,24 @@ Date : 17-Jul-2026
     
 - The solution uses the metadata gallery-dl extracts.
     Parse this JSON to find the hidden video URLs and download them manually, avoiding the need for heavy secondary dependencies like yt-dlp.
+
+
+
+Date : 18-Jul-2026
+
+- Pinterest Carousel Video Download Fix
+
+- src/organizer.py:
+   - Added a new pre-pass loop at the beginning of the `organize_metadata` function.
+   - The script now scans all `.json` files in the output directory specifically looking for the `carousel_data` block, which contains data about multiple media items in a single pin.
+   - If `carousel_data` is found, the script iterates through its slots to identify hidden `videos`.
+   - It maintains a unique set of `downloaded_video_ids` to ensure not to re-download a video that was already processed from duplicate JSONs.
+   - Using Python's built-in `urllib.request`, the script silently downloads the highest quality `.mp4` it can find directly to output folder.
+   - It then creates a synthetic `.json` file for the newly downloaded video so that the rest of the script automatically renames it according to the standard convention (e.g., `account_name v1.mp4`).
+   - The function now returns a count of how many extra videos were downloaded.
+
+- src/main.py:
+   - Updated the `organize_metadata` call to receive the new `extra_videos` count.
+   - Adds `extra_videos` to the `items_downloaded` count. 
+   - This ensures that when the terminal dashboard prints the `[SUCCESS] [X]` final line, 
+      the number accurately reflects both the images `gallery-dl` found PLUS any videos our script rescued from the carousel.
