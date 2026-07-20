@@ -262,3 +262,16 @@ Date : 19-Jul-2026
 
 
 Date : 20-Jul-2026
+
+- Updated the preflight.py script 
+    - to remove the panel box 
+    - show a clean message with line spaces 
+    - instructions on how to get the cookie file when Cookie.txt is empty.
+
+Example of the message:
+Cookie.txt is empty.
+
+How to get your cookies:
+  1. Install a browser extension like 'Get cookies.txt LOCALLY'.
+  2. Go to pinterest.com and log in.
+  3. Export the cookies and paste them into Cookie.txt.
