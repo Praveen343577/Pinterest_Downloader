@@ -19,7 +19,7 @@ def run_checks():
     with open(config.COOKIE_FILE, 'r', encoding='utf-8') as f:
         lines = f.readlines()
         if not lines:
-            console.print(Panel("Cookie.txt is empty.", style="red"))
+            console.print("\nCookie.txt is empty.\n\nHow to get your cookies:\n  1. Install a browser extension like 'Get cookies.txt LOCALLY'.\n  2. Go to pinterest.com and log in.\n  3. Export the cookies and paste them into Cookie.txt.\n", style="red")
             return False
             
         first_line = lines[0].rstrip('\n').rstrip('\r')
