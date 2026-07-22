@@ -276,4 +276,8 @@ How to get your cookies:
   2. Go to pinterest.com and log in.
   3. Export the cookies and paste them into Cookie.txt.
 
+
+
+
+
 Date : 22-Jul-2026
