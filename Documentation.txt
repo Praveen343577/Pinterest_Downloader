@@ -280,4 +280,22 @@ How to get your cookies:
 
 
 
-Date : 22-Jul-2026
+Date : 25-Jul-2026
+
+- Fixed: Same link, different treatment (Deduplication Collision)
+  - Issue: 
+    - When downloading Pinterest content, a single Pin could be downloaded multiple times if it was fetched via both its direct individual URL and a board URL. 
+    - This happened because `gallery-dl` generates its archive database keys dynamically based on the extraction context:
+        - Direct Pin URL -> Logs `pinterest<pin_id>` (e.g., `pinterest1090715603531367527`)
+        - Board URL -> Logs `pinterest<board_id><pin_id>` (e.g., `pinterest10851564727357977655696842628602139141`)
+    - As a result, SQLite stored them under different keys, and `gallery-dl` failed to recognize them as duplicates.
+
+  - Finding the Solution:
+    - Analyzed how `gallery-dl` handles configuration parameters for the download archive. Rather than writing a heavy preprocessing script to scrape boards (which would drastically increase Pinterest API calls and risk rate-limiting), leveraged `gallery-dl`'s internal configuration options:
+    - By overriding the `archive-format` configuration, script can control how the archive string is compiled.
+    - Note on testing: Passing `archive-format=pinterest{id}` resulted in `pinterestpinterest<id>` because `gallery-dl` natively prepends the extractor name (`pinterest`) to the database key. Therefore, the correct format option was determined to be `{id}`.
+
+  - Resolution:
+    - Added the `-o` configuration flag to the `gallery-dl` CLI command in `src/downloader.py`:
+    `-o "archive-format={id}"`
+    - This ensures `gallery-dl` always evaluates the archive entry as the pure Pin ID (e.g., `{id}`), and then automatically prepends the extractor prefix to store it as `pinterest<pin_id>`. This standardizes all database entries regardless of whether they originate from a Board or a direct Pin link, preventing duplicate downloads cleanly.
