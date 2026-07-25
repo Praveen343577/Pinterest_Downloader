@@ -2,6 +2,8 @@ import subprocess
 import time
 import urllib.request
 import config
+import sqlite3
+import re
 
 def resolve_url(url):
     if "pin.it" in url.lower():
@@ -15,10 +17,23 @@ def resolve_url(url):
             pass
     return url
 
-def download_url(url, callback=None):
+def download_url(url, callback=None, force=False):
     start_time = time.time()
     
     actual_url = resolve_url(url)
+    
+    if force:
+        match = re.search(r'/pin/(\d+)', actual_url)
+        if match:
+            pin_id = match.group(1)
+            try:
+                conn = sqlite3.connect(config.ARCHIVE_FILE)
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM archive WHERE entry = ?", (f"pinterest{pin_id}",))
+                conn.commit()
+                conn.close()
+            except Exception:
+                pass
     
     template = "{id}_{num}.{extension}"
     
@@ -88,7 +103,7 @@ def download_url(url, callback=None):
     
     if rc == 0:
         if items > 0:
-            status = "SUCCESS"
+            status = "FORCED" if force else "SUCCESS"
         elif skipped_items > 0:
             status = "EXISTS"
         else:
