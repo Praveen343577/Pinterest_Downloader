@@ -298,3 +298,14 @@ Date : 25-Jul-2026
   - Resolution:
     - Added the `-o` configuration flag to the `gallery-dl` CLI command in `src/downloader.py`: `-o "archive-format={id}"`
     - This ensures `gallery-dl` always evaluates the archive entry as the pure Pin ID (e.g., `{id}`), and then automatically prepends the extractor prefix to store it as `pinterest<pin_id>`. This standardizes all database entries regardless of whether they originate from a Board or a direct Pin link, preventing duplicate downloads cleanly.
+
+- Feature: Force Redownload
+  - Description:
+    - Added the ability to forcefully redownload specific links that were already recorded in the SQLite archive, without breaking `gallery-dl`'s deduplication.
+  - Implementation:
+    - Links in `Links.txt` can now be prefixed with `!` or `[FORCE]` (e.g., `!https://...` or `[FORCE] https://...`).
+    - The parser (`src/parser.py`) strips these tags and flags the URL for a forced download. If a board URL is forced, all individual pins extracted from it inherit the flag.
+    - When flagged, the downloader (`src/downloader.py`) connects to `DownloadArchive.sqlite3` and explicitly deletes the specific `pinterest<pin_id>` entry using Python's `sqlite3` library before executing `gallery-dl`.
+    - `gallery-dl` processes the link, downloads it as if it were new, and writes the entry back to the archive, ensuring long-term tracking remains intact.
+  - Dashboard Integration:
+    - Introduced a new `[FORCED]` status category (displayed in magenta) for both the live tracking dashboard and the final execution summary to clearly distinguish them from standard successful downloads.
