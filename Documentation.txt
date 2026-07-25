@@ -296,6 +296,5 @@ Date : 25-Jul-2026
     - Note on testing: Passing `archive-format=pinterest{id}` resulted in `pinterestpinterest<id>` because `gallery-dl` natively prepends the extractor name (`pinterest`) to the database key. Therefore, the correct format option was determined to be `{id}`.
 
   - Resolution:
-    - Added the `-o` configuration flag to the `gallery-dl` CLI command in `src/downloader.py`:
-    `-o "archive-format={id}"`
+    - Added the `-o` configuration flag to the `gallery-dl` CLI command in `src/downloader.py`: `-o "archive-format={id}"`
     - This ensures `gallery-dl` always evaluates the archive entry as the pure Pin ID (e.g., `{id}`), and then automatically prepends the extractor prefix to store it as `pinterest<pin_id>`. This standardizes all database entries regardless of whether they originate from a Board or a direct Pin link, preventing duplicate downloads cleanly.
