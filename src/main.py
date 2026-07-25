@@ -50,26 +50,28 @@ def main():
             failed_links = []
             is_retry = (pass_num > 1)
             
-            for i, url in enumerate(current_links):
-                orig_i = valid_urls.index(url)
-                dash.new_link(orig_i, url, pass_num)
+            for i, item in enumerate(current_links):
+                orig_i = valid_urls.index(item)
+                url_str = item['url']
+                force_flag = item['force']
+                dash.new_link(orig_i, url_str, pass_num)
                 
                 def cb(count):
                     dash.update_item_count(count)
                     
-                result = download_url(url, callback=cb)
+                result = download_url(url_str, callback=cb, force=force_flag)
                 extracted_metadata, extra_videos = organize_metadata()
                 result['extracted_metadata'] = extracted_metadata
                 result['items_downloaded'] += extra_videos
                 session_logger.record(result)
                 
                 status = result['status']
-                success = status in ['SUCCESS', 'EXISTS', 'EMPTY']
+                success = status in ['SUCCESS', 'EXISTS', 'EMPTY', 'FORCED']
                 dash.complete_link(status, result['duration'], is_retry)
-                dash.print_result(status, result['items_downloaded'], url)
+                dash.print_result(status, result['items_downloaded'], url_str)
                 
                 if not success and status != 'DEADLINK':
-                    failed_links.append(url)
+                    failed_links.append(item)
                 
                 if i < len(current_links) - 1:
                     if (orig_i + 1) % config.SESSION_SIZE == 0:
@@ -88,7 +90,7 @@ def main():
                             elapsed += 0.1
 
     session_logger.write()
-    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count, dash.empty_count, dash.deadlink_count)
+    print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count, dash.empty_count, dash.deadlink_count, dash.forced_count)
     # dash.flush_results()
 
 if __name__ == "__main__":
