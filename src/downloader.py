@@ -28,7 +28,7 @@ def download_url(url, callback=None):
         "--download-archive", config.ARCHIVE_FILE,
         "--directory", config.OUTPUT_BASE,
         "-o", "directory=[\".\"]",
-        "-o", "archive-format=pinterest{id}",
+        "-o", "archive-format={id}",
         "--filename", template,
         "--write-metadata",
         "--sleep-request", "1-3",
