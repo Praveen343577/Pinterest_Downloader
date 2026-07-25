@@ -110,17 +110,14 @@ def parse_links():
                     valid_urls.append({'url': expanded_url, 'force': force})
                 
     # Remove duplicates globally while preserving order and force flags
+    # We treat a normal link and a forced link as distinct entries.
     unique_valid_urls = []
     seen = set()
     for item in valid_urls:
-        if item['url'] not in seen:
+        identifier = (item['url'], item['force'])
+        if identifier not in seen:
             unique_valid_urls.append(item)
-            seen.add(item['url'])
-        elif item['force']:
-            for u in unique_valid_urls:
-                if u['url'] == item['url']:
-                    u['force'] = True
-                    break
+            seen.add(identifier)
     valid_urls = unique_valid_urls
             
     return valid_urls, invalid_urls
