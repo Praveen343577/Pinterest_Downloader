@@ -18,8 +18,8 @@ def print_header(total_links, log_name):
 def print_preflight_success(msg):
     console.print(f"{msg}\n")
 
-def print_summary(total_time, success, failed, exists, empty, deadlink):
-    console.print(f"\nExecution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed} | exists: {exists} | empty: {empty} | deadlink: {deadlink}\n")
+def print_summary(total_time, success, failed, exists, empty, deadlink, forced=0):
+    console.print(f"\nExecution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed} | exists: {exists} | empty: {empty} | deadlink: {deadlink} | forced: {forced}\n")
 
 class DashboardManager:
     def __init__(self, total_links):
@@ -30,6 +30,7 @@ class DashboardManager:
         self.exists_count = 0
         self.empty_count = 0
         self.deadlink_count = 0
+        self.forced_count = 0
         self.current_url = ""
         self.link_items = 0
         self.link_start_time = 0
@@ -46,7 +47,7 @@ class DashboardManager:
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TextColumn("{task.completed} / {task.total} links")
         )
-        self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0, exists=0, empty=0, deadlink=0)
+        self.task_id = self.progress.add_task("Overall Progress", total=self.total_links, success=0, fail=0, exists=0, empty=0, deadlink=0, forced=0)
         self.live = Live(self.progress, console=console, refresh_per_second=4)
         self.results_log = []
 
@@ -56,7 +57,7 @@ class DashboardManager:
         
         grid.add_row(self.progress)
         
-        stats_line = Text.from_markup(f"[green][SUCCESS : {self.success_count}][/green] [red][FAILED : {self.fail_count}][/red] [blue][EXISTS : {self.exists_count}][/blue] [cyan][EMPTY : {self.empty_count}][/cyan] [bright_black][DEADLINK : {self.deadlink_count}][/bright_black]")
+        stats_line = Text.from_markup(f"[green][SUCCESS : {self.success_count}][/green] [red][FAILED : {self.fail_count}][/red] [blue][EXISTS : {self.exists_count}][/blue] [cyan][EMPTY : {self.empty_count}][/cyan] [bright_black][DEADLINK : {self.deadlink_count}][/bright_black] [magenta][FORCED : {self.forced_count}][/magenta]")
         grid.add_row(stats_line)
         grid.add_row("")
         
@@ -134,6 +135,9 @@ class DashboardManager:
             elif status == "DEADLINK":
                 self.deadlink_count += 1
                 self.fail_count -= 1
+            elif status == "FORCED":
+                self.forced_count += 1
+                self.fail_count -= 1
         else:
             if status == "SUCCESS":
                 self.success_count += 1
@@ -143,14 +147,16 @@ class DashboardManager:
                 self.empty_count += 1
             elif status == "DEADLINK":
                 self.deadlink_count += 1
+            elif status == "FORCED":
+                self.forced_count += 1
             else:
                 self.fail_count += 1
         self.durations.append(duration)
         
         if is_retry:
-            self.progress.update(self.task_id, success=self.success_count, fail=self.fail_count, exists=self.exists_count, empty=self.empty_count, deadlink=self.deadlink_count)
+            self.progress.update(self.task_id, success=self.success_count, fail=self.fail_count, exists=self.exists_count, empty=self.empty_count, deadlink=self.deadlink_count, forced=self.forced_count)
         else:
-            self.progress.update(self.task_id, advance=1, success=self.success_count, fail=self.fail_count, exists=self.exists_count, empty=self.empty_count, deadlink=self.deadlink_count)
+            self.progress.update(self.task_id, advance=1, success=self.success_count, fail=self.fail_count, exists=self.exists_count, empty=self.empty_count, deadlink=self.deadlink_count, forced=self.forced_count)
             
         self.update_display()
 
@@ -170,6 +176,8 @@ class DashboardManager:
             status_text = f"[blue]{status:<10}[/blue]"
         elif status == "EMPTY":
             status_text = f"[cyan]{status:<10}[/cyan]"
+        elif status == "FORCED":
+            status_text = f"[magenta]{status:<10}[/magenta]"
         elif status == "DEADLINK":
             status_text = f"[bright_black]{status:<10}[/bright_black]"
         else:
