@@ -70,13 +70,19 @@ def parse_links():
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
+            
+            force = False
+            if line.startswith('!') or line.upper().startswith('[FORCE]'):
+                force = True
+                line = re.sub(r'^(!|\[FORCE\])\s*', '', line, flags=re.IGNORECASE).strip()
+
             if pattern.match(line):
-                raw_valid.append(line)
+                raw_valid.append({'url': line, 'force': force})
             else:
                 invalid_urls.append((i, line))
                 
     if raw_valid:
-        needs_expansion = [u for u in raw_valid if not pin_pattern.search(u)]
+        needs_expansion = [item['url'] for item in raw_valid if not pin_pattern.search(item['url'])]
         expanded_map = {}
         
         if needs_expansion:
@@ -85,10 +91,8 @@ def parse_links():
                 SpinnerColumn("my_dots", style="yellow"),
                 TextColumn(" | [cyan]Elapsed:[/cyan]"),
                 TimeElapsedColumn(),
-                # CustomTimeElapsedColumn(),
                 TextColumn(" | [cyan]ETA:[/cyan]"),
                 TimeRemainingColumn(),
-                # CustomTimeRemainingColumn(),
                 console=console
             ) as progress:
                 task = progress.add_task("", total=len(needs_expansion))
@@ -96,14 +100,28 @@ def parse_links():
                     expanded_map[url] = expand_url(url)
                     progress.update(task, advance=1)
                     
-        for url in raw_valid:
+        for item in raw_valid:
+            url = item['url']
+            force = item['force']
             if pin_pattern.search(url):
-                valid_urls.append(url)
+                valid_urls.append({'url': url, 'force': force})
             else:
-                valid_urls.extend(expanded_map[url])
+                for expanded_url in expanded_map.get(url, []):
+                    valid_urls.append({'url': expanded_url, 'force': force})
                 
-    # Remove duplicates globally while preserving order
-    valid_urls = list(dict.fromkeys(valid_urls))
+    # Remove duplicates globally while preserving order and force flags
+    unique_valid_urls = []
+    seen = set()
+    for item in valid_urls:
+        if item['url'] not in seen:
+            unique_valid_urls.append(item)
+            seen.add(item['url'])
+        elif item['force']:
+            for u in unique_valid_urls:
+                if u['url'] == item['url']:
+                    u['force'] = True
+                    break
+    valid_urls = unique_valid_urls
             
     return valid_urls, invalid_urls
 
