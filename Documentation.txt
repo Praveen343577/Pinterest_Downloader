@@ -341,3 +341,6 @@ Example of the new JSON output:
   "total_execution_time": 2.5,
   "link_details": [...]
 }
+
+- Removed all the Panel() wrappers in `src/preflight.py` and replaced them with regular formatted print messages that match the style of the empty cookie message. 
+    - This includes adding the blank lines before, between paragraphs, and after the messages for consistency.
