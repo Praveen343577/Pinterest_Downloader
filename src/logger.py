@@ -36,7 +36,14 @@ class Logger:
 
     def write(self):
         success_count = sum(1 for d in self.link_details if d['status'] == 'SUCCESS')
-        failed_count = len(self.link_details) - success_count
+        exists_count = sum(1 for d in self.link_details if d['status'] == 'EXISTS')
+        empty_count = sum(1 for d in self.link_details if d['status'] == 'EMPTY')
+        deadlink_count = sum(1 for d in self.link_details if d['status'] == 'DEADLINK')
+        forced_count = sum(1 for d in self.link_details if d['status'] == 'FORCED')
+        
+        known_statuses = {'SUCCESS', 'EXISTS', 'EMPTY', 'DEADLINK', 'FORCED'}
+        failed_count = sum(1 for d in self.link_details if d['status'] not in known_statuses)
+        
         total_execution_time = round(time.time() - self.start_time, 2)
         
         data = {
@@ -44,6 +51,10 @@ class Logger:
             "total_links_detected": self.total_links_detected,
             "successful_links": success_count,
             "failed_links": failed_count,
+            "exists_links": exists_count,
+            "empty_links": empty_count,
+            "deadlink_links": deadlink_count,
+            "forced_links": forced_count,
             "total_execution_time": total_execution_time,
             "link_details": self.link_details
         }
