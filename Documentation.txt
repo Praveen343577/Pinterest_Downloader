@@ -309,3 +309,35 @@ Date : 25-Jul-2026
     - `gallery-dl` processes the link, downloads it as if it were new, and writes the entry back to the archive, ensuring long-term tracking remains intact.
   - Dashboard Integration:
     - Introduced a new `[FORCED]` status category (displayed in magenta) for both the live tracking dashboard and the final execution summary to clearly distinguish them from standard successful downloads.
+
+
+
+
+
+Date : 26-Jul-2026
+
+- Updated `src/logger.py` to accurately count and include all the different link statuses in the JSON output, rather than grouping everything that isn't SUCCESS into FAILED.
+- The JSON log will now include the following fields:
+    - total_links_detected
+    - successful_links
+    - failed_links
+    - exists_links
+    - empty_links
+    - deadlink_links
+    - forced_links
+    - total_execution_time
+
+Example of the new JSON output:
+
+{
+  "session_id": "2026-07-26T16:02:39.153163",
+  "total_links_detected": 3,
+  "successful_links": 1,
+  "failed_links": 0,
+  "exists_links": 1,
+  "empty_links": 0,
+  "deadlink_links": 1,
+  "forced_links": 0,
+  "total_execution_time": 2.5,
+  "link_details": [...]
+}
