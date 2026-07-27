@@ -1,4 +1,5 @@
 import re
+import urllib.request
 import config
 import subprocess
 from rich.console import Console
@@ -51,11 +52,47 @@ def expand_url(url):
         )
         stdout, _ = process.communicate(timeout=120)
         urls = [line.strip() for line in stdout.split('\n') if line.strip().startswith("http")]
-        # Remove duplicates while preserving order
-        urls = list(dict.fromkeys(urls))
+        # Intentionally keeping duplicates so they show as EXISTS
         return urls if urls else [url]
     except Exception:
         return [url]
+
+def fetch_board_pin_count(url):
+    cmd = [
+        config.GALLERY_DL_PATH,
+        "--cookies", config.COOKIE_FILE,
+        "--dump-json",
+        "--range", "1-1",
+        url
+    ]
+    creationflags = 0x08000000 
+    try:
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding='utf-8',
+            creationflags=creationflags
+        )
+        stdout, _ = process.communicate(timeout=60)
+        
+        try:
+            import json
+            data = json.loads(stdout)
+            if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list) and len(data[0]) > 0:
+                first_item = data[0][0]
+                if 'board' in first_item and 'pin_count' in first_item['board']:
+                    return int(first_item['board']['pin_count'])
+        except Exception:
+            pass
+            
+        m = re.search(r'"pin_count"\s*:\s*(\d+)', stdout)
+        if m:
+            return int(m.group(1))
+    except Exception:
+        pass
+    return None
 
 def parse_links():
     valid_urls = []
@@ -106,19 +143,19 @@ def parse_links():
             if pin_pattern.search(url):
                 valid_urls.append({'url': url, 'force': force})
             else:
-                for expanded_url in expanded_map.get(url, []):
+                expanded = expanded_map.get(url, [])
+                for expanded_url in expanded:
                     valid_urls.append({'url': expanded_url, 'force': force})
                 
-    # Remove duplicates globally while preserving order and force flags
-    # We treat a normal link and a forced link as distinct entries.
-    unique_valid_urls = []
-    seen = set()
-    for item in valid_urls:
-        identifier = (item['url'], item['force'])
-        if identifier not in seen:
-            unique_valid_urls.append(item)
-            seen.add(identifier)
-    valid_urls = unique_valid_urls
+                if expanded and not (len(expanded) == 1 and expanded[0] == url):
+                    official_count = fetch_board_pin_count(url)
+                    if official_count and official_count > len(expanded):
+                        diff = official_count - len(expanded)
+                        for _ in range(diff):
+                            valid_urls.append({'url': 'Ghost/Deleted Pin', 'force': False, 'is_ghost': True})
+                
+    # Deliberately removed global deduplication to allow duplicates to be processed
+    # as EXISTS natively by gallery-dl, bringing counts closer to Pinterest's UI.
             
     return valid_urls, invalid_urls
 

@@ -54,24 +54,38 @@ def main():
                 orig_i = valid_urls.index(item)
                 url_str = item['url']
                 force_flag = item['force']
+                is_ghost = item.get('is_ghost', False)
                 dash.new_link(orig_i, url_str, pass_num)
                 
-                def cb(count):
-                    dash.update_item_count(count)
+                if is_ghost:
+                    result = {
+                        "url": url_str,
+                        "status": "DEADLINK",
+                        "items_downloaded": 0,
+                        "error_message": "Ghost/Deleted pin missing from API",
+                        "duration": 0.0,
+                        "extracted_metadata": [],
+                    }
+                    session_logger.record(result)
+                    dash.complete_link('DEADLINK', 0.0, is_retry)
+                    dash.print_result('DEADLINK', 0, url_str)
+                else:
+                    def cb(count):
+                        dash.update_item_count(count)
+                        
+                    result = download_url(url_str, callback=cb, force=force_flag)
+                    extracted_metadata, extra_videos = organize_metadata()
+                    result['extracted_metadata'] = extracted_metadata
+                    result['items_downloaded'] += extra_videos
+                    session_logger.record(result)
                     
-                result = download_url(url_str, callback=cb, force=force_flag)
-                extracted_metadata, extra_videos = organize_metadata()
-                result['extracted_metadata'] = extracted_metadata
-                result['items_downloaded'] += extra_videos
-                session_logger.record(result)
-                
-                status = result['status']
-                success = status in ['SUCCESS', 'EXISTS', 'EMPTY', 'FORCED']
-                dash.complete_link(status, result['duration'], is_retry)
-                dash.print_result(status, result['items_downloaded'], url_str)
-                
-                if not success and status != 'DEADLINK':
-                    failed_links.append(item)
+                    status = result['status']
+                    success = status in ['SUCCESS', 'EXISTS', 'EMPTY', 'FORCED']
+                    dash.complete_link(status, result['duration'], is_retry)
+                    dash.print_result(status, result['items_downloaded'], url_str)
+                    
+                    if not success and status != 'DEADLINK':
+                        failed_links.append(item)
                 
                 if i < len(current_links) - 1:
                     if (orig_i + 1) % config.SESSION_SIZE == 0:
