@@ -102,8 +102,18 @@ class DashboardManager:
         
         if self.results_log:
             grid.add_row("")
-            for res in self.results_log:
-                grid.add_row(res)
+            res_table = Table(show_header=True, expand=True)
+            res_table.add_column("Status", width=12)
+            res_table.add_column("Items", justify="center", width=8)
+            res_table.add_column("URL")
+            
+            for res in reversed(self.results_log):
+                if res and isinstance(res, tuple) and len(res) == 3:
+                    res_table.add_row(res[0], str(res[1]), res[2])
+                else:
+                    res_table.add_row("", "", "")
+                    
+            grid.add_row(res_table)
                 
         return grid
 
@@ -182,20 +192,27 @@ class DashboardManager:
     def print_result(self, status, items, url):
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
         if status == "SUCCESS":
-            status_text = f"[green]{status:<10}[/green]"
+            status_text = f"[green]{status}[/green]"
         elif status == "EXISTS":
-            status_text = f"[blue]{status:<10}[/blue]"
+            status_text = f"[blue]{status}[/blue]"
         elif status == "EMPTY":
-            status_text = f"[cyan]{status:<10}[/cyan]"
+            status_text = f"[cyan]{status}[/cyan]"
         elif status == "FORCED":
-            status_text = f"[magenta]{status:<10}[/magenta]"
+            status_text = f"[magenta]{status}[/magenta]"
         elif status == "DEADLINK":
-            status_text = f"[bright_black]{status:<10}[/bright_black]"
+            status_text = f"[bright_black]{status}[/bright_black]"
         else:
-            status_text = f"[red]{status:<10}[/red]"
-        self.results_log.append(f"{status_text} [{items}] {trunc_url}")
+            status_text = f"[red]{status}[/red]"
+            
+        self.results_log.append((status_text, items, trunc_url))
+        
+        if len(self.results_log) > 20:
+            self.results_log.pop(0)
+            
         self.update_display()
 
     def add_line_space(self):
-        self.results_log.append("")
+        self.results_log.append(("", "", ""))
+        if len(self.results_log) > 20:
+            self.results_log.pop(0)
         self.update_display()
