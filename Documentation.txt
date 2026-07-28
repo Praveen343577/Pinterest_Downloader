@@ -353,3 +353,8 @@ Date : 26-Jul-2026
 
 
 Date : 28-Jul-2026
+
+- Updated the print_summary function in src/dashboard.py to correctly format the total_time. It will now dynamically display hours and minutes when applicable.
+    - If total_time is over 60 minutes, it displays as Xh Ym Z.ZZs.
+    - If total_time is over 60 seconds (but under an hour), it displays as Ym Z.ZZs.
+    - If total_time is under 60 seconds, it remains Z.ZZs.
