@@ -23,13 +23,13 @@ def print_summary(total_time, success, failed, exists, empty, deadlink, forced=0
         h = int(total_time // 3600)
         m = int((total_time % 3600) // 60)
         s = total_time % 60
-        time_str = f"{h}h {m}m {s:.2f}s"
+        time_str = f"{h}hours {m}mins {s:.2f}seconds"
     elif total_time > 60:
         m = int(total_time // 60)
         s = total_time % 60
-        time_str = f"{m}m {s:.2f}s"
+        time_str = f"{m}mins {s:.2f}seconds"
     else:
-        time_str = f"{total_time:.2f}s"
+        time_str = f"{total_time:.2f}seconds"
         
     console.print(f"\nExecution complete in {time_str}\nSuccess: {success} | Failed: {failed} | exists: {exists} | empty: {empty} | deadlink: {deadlink} | forced: {forced}\n")
 class DashboardManager:
