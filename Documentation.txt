@@ -358,3 +358,14 @@ Date : 28-Jul-2026
     - If total_time is over 60 minutes, it displays as Xh Ym Z.ZZs.
     - If total_time is over 60 seconds (but under an hour), it displays as Ym Z.ZZs.
     - If total_time is under 60 seconds, it remains Z.ZZs.
+
+
+
+
+
+Date : 29-Jul-2026
+
+- Updated the script to implement the terminal table
+    - Rich Table integration: The results_log now renders using rich.table.Table with three columns: Status, Items, and URL. The layout expands to fit the screen neatly.
+    - Reverse Order: As requested, the newest link will now always appear at the top row, pushing older ones downwards.
+    - Hard Limit of 20 Items: The internal memory holding the link list is strictly capped at 20 items. This permanently solves the terminal scrolling problem and removes those red ... dots at the bottom, keeping your real-time dashboard completely stable!
