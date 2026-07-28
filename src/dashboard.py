@@ -19,8 +19,19 @@ def print_preflight_success(msg):
     console.print(f"{msg}\n")
 
 def print_summary(total_time, success, failed, exists, empty, deadlink, forced=0):
-    console.print(f"\nExecution complete in {total_time:.2f}s\nSuccess: {success} | Failed: {failed} | exists: {exists} | empty: {empty} | deadlink: {deadlink} | forced: {forced}\n")
-
+    if total_time > 3600:
+        h = int(total_time // 3600)
+        m = int((total_time % 3600) // 60)
+        s = total_time % 60
+        time_str = f"{h}h {m}m {s:.2f}s"
+    elif total_time > 60:
+        m = int(total_time // 60)
+        s = total_time % 60
+        time_str = f"{m}m {s:.2f}s"
+    else:
+        time_str = f"{total_time:.2f}s"
+        
+    console.print(f"\nExecution complete in {time_str}\nSuccess: {success} | Failed: {failed} | exists: {exists} | empty: {empty} | deadlink: {deadlink} | forced: {forced}\n")
 class DashboardManager:
     def __init__(self, total_links):
         self.total_links = total_links
