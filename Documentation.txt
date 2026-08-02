@@ -375,3 +375,9 @@ Date : 29-Jul-2026
 
 
 Date : 2-Aug-2026
+
+- Fixed terminal dashboard table column width allocation in src/dashboard.py.
+    - Configured strict, fixed widths for the Status and Items columns to prevent proportional stretching.
+    - Configured the URL column to dynamically fill the remaining terminal space.
+- Modified terminal table border styling.
+    - Replaced the default heavy header style with a rounded style to ensure uniform line thickness for all table borders.
