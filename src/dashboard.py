@@ -103,9 +103,9 @@ class DashboardManager:
         if self.results_log:
             grid.add_row("")
             res_table = Table(show_header=True, expand=True)
-            res_table.add_column("Status", width=12)
-            res_table.add_column("Items", justify="center", width=8)
-            res_table.add_column("URL")
+            res_table.add_column("Status", width=12, no_wrap=True)
+            res_table.add_column("Items", justify="center", width=8, no_wrap=True)
+            res_table.add_column("URL", ratio=1)
             
             for res in reversed(self.results_log):
                 if res and isinstance(res, tuple) and len(res) == 3:
