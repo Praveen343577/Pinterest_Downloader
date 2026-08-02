@@ -6,6 +6,7 @@ from rich.progress import Progress, BarColumn, TextColumn
 from rich.text import Text
 from rich.live import Live
 from rich.table import Table
+from rich import box
 import config
 
 console = Console()
@@ -102,7 +103,7 @@ class DashboardManager:
         
         if self.results_log:
             grid.add_row("")
-            res_table = Table(show_header=True, expand=True)
+            res_table = Table(show_header=True, expand=True, box=box.ROUNDED)
             res_table.add_column("Status", width=12, no_wrap=True)
             res_table.add_column("Items", justify="center", width=8, no_wrap=True)
             res_table.add_column("URL", ratio=1)
