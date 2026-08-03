@@ -381,3 +381,15 @@ Date : 2-Aug-2026
     - Configured the URL column to dynamically fill the remaining terminal space.
 - Modified terminal table border styling.
     - Replaced the default heavy header style with a rounded style to ensure uniform line thickness for all table borders.
+
+
+
+
+
+Date : 3-Aug-2026
+
+- Increased the Session Size
+    - Increased from 50 to 75.
+- Decreased the Minimum and Maximum Cooldown Time
+    - Decreased from 100-300 to 50-100.
+
