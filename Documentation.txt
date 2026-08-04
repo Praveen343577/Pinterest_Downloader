@@ -393,3 +393,17 @@ Date : 3-Aug-2026
 - Decreased the Minimum and Maximum Cooldown Time
     - Decreased from 100-300 to 50-100.
 
+
+
+
+
+Date : 4-Aug-2026
+
+- Fixed a media file naming collision issue in src/organizer.py.
+    - Problem Faced: Multiple downloaded media files for the same account appeared as duplicates with the same name in the output directory (e.g., three files visually named `account_name p1`).
+
+    - Bug Identified: Windows hides file extensions by default. The script was checking for naming collisions using the full file path including the extension (e.g., `account_name p1.jpg`). 
+    - Consequently, the sequence number was tracked independently for each file format, causing the script to generate `account_name p1.jpg`, `account_name p1.png`, and `account_name p1.gif`, which Windows displayed identically.
+    
+    - Solution Implemented: Updated the renaming logic to check against a globally maintained set of used base names (`used_base_names`) instead of relying on `os.path.exists` with the full file extension.
+    - This ensures sequence numbers increment universally across all media types for an account (resulting in `p1.jpg`, `p2.png`, `p3.gif`).
