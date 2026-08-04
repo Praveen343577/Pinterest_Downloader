@@ -10,17 +10,28 @@
 // ============================================================
 
 (async () => {
-  const SCROLL_STEP = window.innerHeight * 2;
+  const SCROLL_STEP = window.innerHeight * 1.5;
   const SCROLL_DELAY = 1500;
   const STABLE_THRESHOLD = 5;
 
-  const getUniquePinIds = () => {
-    const ids = new Set();
+  let allPins = [];
+  
+  const extractNewPins = () => {
+    let newCount = 0;
     document.querySelectorAll('a[href*="/pin/"]').forEach(a => {
       const m = a.href.match(/\/pin\/(\d+)/);
-      if (m) ids.add(m[1]);
+      if (m) {
+        const pinId = m[1];
+        // Tag the DOM element to avoid counting the exact same element twice,
+        // but still allow duplicates if they appear in different DOM elements.
+        if (a.dataset.extractedId !== pinId) {
+          allPins.push(pinId);
+          a.dataset.extractedId = pinId;
+          newCount++;
+        }
+      }
     });
-    return ids;
+    return newCount;
   };
 
   // ── Auto-scroll ──────────────────────────────────────────
@@ -29,30 +40,30 @@
   window.scrollTo(0, 0);
   await new Promise(r => setTimeout(r, 800));
 
-  let lastCount = 0;
   let stableRounds = 0;
 
   while (stableRounds < STABLE_THRESHOLD) {
-    window.scrollBy(0, SCROLL_STEP);
-    await new Promise(r => setTimeout(r, SCROLL_DELAY));
-
-    const currentCount = getUniquePinIds().size;
-    if (currentCount === lastCount) {
+    const newFound = extractNewPins();
+    
+    if (newFound === 0) {
       stableRounds++;
     } else {
       stableRounds = 0;
-      lastCount = currentCount;
-      console.log(`   Loaded: ${currentCount} pins`);
+      console.log(`   Found ${newFound} new pins. Total so far: ${allPins.length}`);
     }
+
+    window.scrollBy(0, SCROLL_STEP);
+    await new Promise(r => setTimeout(r, SCROLL_DELAY));
   }
 
   // ── Extract ──────────────────────────────────────────────
-  const pinIds = getUniquePinIds();
+  extractNewPins(); // One final pass
+  
   const domain = window.location.hostname;
-  const urls = [...pinIds].map(id => `https://${domain}/pin/${id}/`);
+  const urls = allPins.map(id => `https://${domain}/pin/${id}/`);
 
   // ── Output ───────────────────────────────────────────────
-  console.log(`\n%c✅ Extraction complete: ${urls.length} unique pins found`, "color: #00C853; font-size: 14px; font-weight: bold;");
+  console.log(`\n%c✅ Extraction complete: ${urls.length} total pins found (including duplicates)`, "color: #00C853; font-size: 14px; font-weight: bold;");
   console.log("\n" + urls.join("\n"));
 
   // ── Copy to clipboard ────────────────────────────────────
