@@ -65,6 +65,11 @@ def organize_metadata():
                         except Exception:
                             pass
 
+    used_base_names = set()
+    for f in os.listdir(config.OUTPUT_BASE):
+        if os.path.isfile(os.path.join(config.OUTPUT_BASE, f)) and not f.endswith(".json"):
+            used_base_names.add(os.path.splitext(f)[0])
+
     for filename in os.listdir(config.OUTPUT_BASE):
         if filename.endswith(".json"):
             json_path = os.path.join(config.OUTPUT_BASE, filename)
@@ -125,14 +130,14 @@ def organize_metadata():
             
             seq_num = 1
             new_base_name = f"{account_name} {type_prefix}{seq_num}"
-            new_media_filename = f"{new_base_name}.{ext}"
-            new_media_path = os.path.join(config.OUTPUT_BASE, new_media_filename)
             
-            while os.path.exists(new_media_path):
+            while new_base_name in used_base_names:
                 seq_num += 1
                 new_base_name = f"{account_name} {type_prefix}{seq_num}"
-                new_media_filename = f"{new_base_name}.{ext}"
-                new_media_path = os.path.join(config.OUTPUT_BASE, new_media_filename)
+            
+            used_base_names.add(new_base_name)
+            new_media_filename = f"{new_base_name}.{ext}"
+            new_media_path = os.path.join(config.OUTPUT_BASE, new_media_filename)
                 
             if os.path.exists(media_path):
                 os.rename(media_path, new_media_path)
