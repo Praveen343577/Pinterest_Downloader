@@ -407,3 +407,21 @@ Date : 4-Aug-2026
     
     - Solution Implemented: Updated the renaming logic to check against a globally maintained set of used base names (`used_base_names`) instead of relying on `os.path.exists` with the full file extension.
     - This ensures sequence numbers increment universally across all media types for an account (resulting in `p1.jpg`, `p2.png`, `p3.gif`).
+
+
+- Same pin saved multiple times in a board
+
+- It is possible to that a user can save same pin multiple times in a board.
+- Sometimes auto detect duplication and remove all copies of same pin.
+- but sometimes soemhow same pin is saved multiple times in same board.
+- This happens because Pinterest creates a new Pin Id.
+- Below provided links open same pin, uploaded by same user and have same comments, comments_count, likes_count, saves_count, etc.
+
+https://in.pinterest.com/pin/1090715603532148213/
+https://in.pinterest.com/pin/1090715603532148256/
+
+https://in.pinterest.com/pin/1090715603532148184/
+https://in.pinterest.com/pin/1090715603532148282/
+
+- In such script would not be able to detect it as duplicate.
+- so the script downloads all the pins.
