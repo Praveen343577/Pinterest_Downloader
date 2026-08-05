@@ -10,8 +10,8 @@
 // ============================================================
 
 (async () => {
-  const SCROLL_STEP = window.innerHeight * 1.5;
-  const SCROLL_DELAY = 1500;
+  const SCROLL_STEP = window.innerHeight * 1.2;
+  const SCROLL_DELAY = 2000;
   const STABLE_THRESHOLD = 5;
 
   let allPins = [];

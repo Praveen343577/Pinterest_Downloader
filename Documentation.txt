@@ -423,3 +423,27 @@ Date : 4-Aug-2026
 
     - In such script would not be able to detect it as duplicate.
     - so the script downloads all the pins.
+
+
+
+
+
+Date : 5-Aug-2026
+
+- Case Study: Pinterest Object Relational Mapping and Access Control Enforcement
+    - Mechanism 1: State Separation (Private vs. Public)
+        - The URL acts strictly as a database key, not a state container. Privacy parameters are not encoded in the URL; they are evaluated server-side based on relational database logic.
+
+            1. A request is dispatched to Pinterest's server for the Pin ID.
+            2. The server executes a database lookup to determine the Pin's parent board and its Access Control List (ACL).
+            3. If the board is Private, the server demands a valid authentication token (session cookie) matching the board owner or collaborator. Unauthenticated clients, alternate accounts, and external scrapers (e.g., Cobalt) fail this validation. The server deliberately returns an HTTP 404 (Not Found) or 403 (Forbidden) to obscure the data.
+            4. If the board is Public, the server bypasses session validation and serves the payload to any requester.
+
+    - Mechanism 2: Entity Instantiation (Links A, B, and C)
+        - Pinterest does not assign a single, universal ID to a piece of media. Every time an image is saved (repinned), the system generates a distinct database entity with a new Pin ID. These distinct entities share a pointer to the same underlying media file but possess independent metadata and permissions.
+
+            - Link A (1088604541226352070): This is the entity instantiated specifically on your board. If your board is private, this ID inherits the restrictive ACL. It will unconditionally fail external download attempts.                                                                                                                                    
+            - Link B (687854543121142499): This is a separate entity pointing to the same media file, but it is bound to a public board (likely the original source or an earlier public repin). It is subject to a public ACL, allowing external scrapers to extract the media.
+            - Link C (pin.it/hhGPohe5I): This is a dynamic routing shortlink. When the "Share" function is invoked on a private pin, Pinterest's backend identifies the source media, locates a public entity associated with that media (Link B), and generates the shortlink against the public ID. This protocol guarantees the link resolves for external users while preserving the isolation of your private entity (Link A).
+
+        - The discrepancy in download behavior is driven entirely by which specific Pin ID entity the downloader is querying against the server's ACL logic.
