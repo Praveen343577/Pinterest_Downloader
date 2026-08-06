@@ -431,6 +431,7 @@ Date : 4-Aug-2026
 Date : 5-Aug-2026
 
 - Case Study: Pinterest Object Relational Mapping and Access Control Enforcement
+
     - Mechanism 1: State Separation (Private vs. Public)
         - The URL acts strictly as a database key, not a state container. Privacy parameters are not encoded in the URL; they are evaluated server-side based on relational database logic.
 
@@ -447,3 +448,28 @@ Date : 5-Aug-2026
             - Link C (pin.it/hhGPohe5I): This is a dynamic routing shortlink. When the "Share" function is invoked on a private pin, Pinterest's backend identifies the source media, locates a public entity associated with that media (Link B), and generates the shortlink against the public ID. This protocol guarantees the link resolves for external users while preserving the isolation of your private entity (Link A).
 
         - The discrepancy in download behavior is driven entirely by which specific Pin ID entity the downloader is querying against the server's ACL logic.
+
+
+
+
+
+Date : 6-Aug-2026
+
+- Case Study: Behavior of script on different types of Pinterest links
+
+    - Direct Pin Links (e.g., pinterest.com/pin/123456789/):
+        - gallery-dl is smart enough to extract the Pin ID directly from the URL itself. 
+        - It checks that ID against local SQLite database before making any network requests. 
+        - If the ID is found in database, it skips it instantly—making zero calls to Pinterest. 
+        - Pinterest never registers a visit.
+
+    - Board or Profile Links:
+        - To know what pins are inside a board, gallery-dl must make an API call to Pinterest to fetch the list of contents. 
+        - It then checks those pins against database. 
+        - Even if user has already have all the pins, Pinterest still registered that user requested the board's page.
+
+    - Short Links (e.g., pin.it/...):
+        - script has a resolve_url function that connects to Pinterest to expand the short link into a full URL so gallery-dl can read it. 
+        - So, a connection is made to Pinterest to resolve the link, even if the resulting pin is already in database.
+
+    So if Links.txt is filled with direct pinterest.com/pin/... links that user already have, processing them is entirely offline and Pinterest is completely unaware!
