@@ -11,7 +11,7 @@
 
 (async () => {
   const SCROLL_STEP = window.innerHeight * 1.2;
-  const SCROLL_DELAY = 2000;
+  const SCROLL_DELAY = 2500;
   const STABLE_THRESHOLD = 5;
 
   let allPins = [];
