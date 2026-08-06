@@ -74,20 +74,21 @@ def main():
                     failed_links.append(item)
                 
                 if i < len(current_links) - 1:
-                    if (orig_i + 1) % config.SESSION_SIZE == 0:
-                        cooldown_dur = random.uniform(config.MIN_COOLDOWN, config.MAX_COOLDOWN)
-                        elapsed = 0
-                        while elapsed < cooldown_dur:
-                            dash.set_cooldown(cooldown_dur - elapsed, cooldown_dur)
-                            time.sleep(1)
-                            elapsed += 1
-                    else:
-                        delay_dur = random.uniform(config.MIN_DELAY, config.MAX_DELAY)
-                        elapsed = 0
-                        while elapsed < delay_dur:
-                            dash.set_delay(delay_dur - elapsed)
-                            time.sleep(0.1)
-                            elapsed += 0.1
+                    if status != 'EXISTS':
+                        if (orig_i + 1) % config.SESSION_SIZE == 0:
+                            cooldown_dur = random.uniform(config.MIN_COOLDOWN, config.MAX_COOLDOWN)
+                            elapsed = 0
+                            while elapsed < cooldown_dur:
+                                dash.set_cooldown(cooldown_dur - elapsed, cooldown_dur)
+                                time.sleep(1)
+                                elapsed += 1
+                        else:
+                            delay_dur = random.uniform(config.MIN_DELAY, config.MAX_DELAY)
+                            elapsed = 0
+                            while elapsed < delay_dur:
+                                dash.set_delay(delay_dur - elapsed)
+                                time.sleep(0.1)
+                                elapsed += 0.1
 
     session_logger.write()
     print_summary(time.time() - start_time, dash.success_count, dash.fail_count, dash.exists_count, dash.empty_count, dash.deadlink_count, dash.forced_count)
