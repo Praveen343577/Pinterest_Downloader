@@ -473,3 +473,17 @@ Date : 6-Aug-2026
         - So, a connection is made to Pinterest to resolve the link, even if the resulting pin is already in database.
 
     So if Links.txt is filled with direct pinterest.com/pin/... links that user already have, processing them is entirely offline and Pinterest is completely unaware!
+
+
+
+
+
+Date : 7-Aug-2026
+
+- Optimization: No Delay for EXISTS Links
+    - Updated src/main.py to bypass the standard inter-link delay (2-5 seconds) and the session cooldown timer whenever gallery-dl returns an EXISTS status.
+    - Since gallery-dl skips downloading the link when the ID is already present in the local database, skipping the Python-level delay significantly speeds up the processing of long lists filled with already-downloaded links.
+
+- Update: Session Log Naming Convention
+    - Modified src/logger.py to append the current date to log file names to match the folder naming structure (e.g., Log 1 2026_08_07.json).
+    - Updated the regular expression logic to successfully identify the maximum log sequence number across both the new and old (Log 1.json) file naming formats, ensuring seamless backward compatibility.
