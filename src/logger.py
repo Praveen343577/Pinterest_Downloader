@@ -15,13 +15,14 @@ class Logger:
         max_num = 0
         if os.path.exists(config.LOGS_DIR):
             for f in os.listdir(config.LOGS_DIR):
-                m = re.match(r"Log (\d+)\.json", f)
+                m = re.match(r"Log (\d+)(?: \d{4}_\d{2}_\d{2})?\.json", f)
                 if m:
                     num = int(m.group(1))
                     if num > max_num:
                         max_num = num
         self.log_num = max_num + 1
-        self.log_name = f"Log {self.log_num}.json"
+        current_date = datetime.datetime.now().strftime("%Y_%m_%d")
+        self.log_name = f"Log {self.log_num} {current_date}.json"
         self.log_path = os.path.join(config.LOGS_DIR, self.log_name)
 
     def record(self, result_dict):
