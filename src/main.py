@@ -59,13 +59,22 @@ def main():
                 def cb(count):
                     dash.update_item_count(count)
                     
-                result = download_url(url_str, callback=cb, force=force_flag)
-                extracted_metadata, extra_videos = organize_metadata()
-                result['extracted_metadata'] = extracted_metadata
-                result['items_downloaded'] += extra_videos
+                while True:
+                    result = download_url(url_str, callback=cb, force=force_flag)
+                    extracted_metadata, extra_videos = organize_metadata()
+                    result['extracted_metadata'] = extracted_metadata
+                    result['items_downloaded'] += extra_videos
+                    
+                    status = result['status']
+                    
+                    if status in ['FAILED', 'TIMEOUT', 'HTTP_403']:
+                        from network import wait_for_internet
+                        if wait_for_internet(dash):
+                            continue
+                    break
+                    
                 session_logger.record(result)
                 
-                status = result['status']
                 success = status in ['SUCCESS', 'EXISTS', 'EMPTY', 'FORCED']
                 dash.complete_link(status, result['duration'], is_retry)
                 dash.print_result(status, result['items_downloaded'], url_str)
