@@ -522,4 +522,10 @@ Date : 8-Aug-2026
         - If the status is `FAILED` (or a specific network-related error like `TIMEOUT`), immediately invoke `wait_for_internet(dash)`.
         - Post-wait evaluation:
             - If `wait_for_internet` determines the internet was indeed down and is now restored, the script utilizes `continue` to instantly re-execute `download_url()` for the exact same link, without advancing the queue.
-            - If `wait_for_internet` confirms the internet was active the whole time (meaning the failure was a legitimate link/server issue), or if the initial download status was `SUCCESS`, `EXISTS`, etc., the script breaks the `while True:` loop and proceeds to log the result normally.
+            - If `wait_for_internet` confirms the internet was active the whole time (meaning the failure was a legitimate link/server issue), or if the initial download status was `SUCCESS`, `EXISTS`, etc., the script breaks the `while True:` loop and proceeds to log the result normally.
+
+
+
+
+
+Date : 9-Aug-2026
