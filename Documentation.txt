@@ -494,4 +494,32 @@ Date : 7-Aug-2026
 
 Date : 8-Aug-2026
 
--
+- Reactive Internet Connection Pausing
+
+    - Problem: Network failures during the download process cause remaining links to be marked as failed, disrupting the download queue.
+    - Solution: Implement a reactive "Pause and Resume" mechanism that detects internet outages and automatically pauses the script using an exponential backoff strategy, resuming once connectivity is restored.
+
+    - Component 1: Network Connectivity Checker (`src/network.py`) [NEW]
+        - Create a dedicated module `network.py` for network-related utility functions.
+        - `check_internet()`: A highly responsive function that attempts to open a TCP socket on port 53 (DNS) for standard public DNS servers (`8.8.8.8`, `1.1.1.1`) and port 80 for `google.com`. 
+            - Uses a short 3-second timeout to prevent long hanging. 
+            - Returns `True` if any connection succeeds, `False` if all attempts fail.
+        - `wait_for_internet(dash)`: The core pause logic. 
+            - First executes a rapid `check_internet()` to avoid false positives. If the connection is active, it returns immediately.
+            - If disconnected, it enters a `while not check_internet():` loop.
+            - Implements exponential backoff for checking frequency (e.g., `delay = min(delay * 2, 300)`) via `time.sleep()`.
+            - Communicates the paused state and the next check interval to the dashboard via the passed `dash` object.
+
+    - Component 2: Dashboard UI Updates (`src/dashboard.py`) [MODIFY]
+        - Add a new method `set_pause(msg)` to the `DashboardManager` class.
+        - This method updates the `self.delay_msg` variable (or a new dedicated status display) with a highly visible warning (e.g., a bright red text: "No Internet Connection! Retrying in X seconds...").
+        - Ensures the user is immediately aware that the script is paused due to network issues, not frozen.
+
+    - Component 3: Main Execution Loop Integration (`src/main.py`) [MODIFY]
+        - Modify the primary download iteration loop to accommodate dynamic pausing and retrying.
+        - Wrap the core `download_url()` invocation within a `while True:` loop for a specific link.
+        - After `download_url()` completes, inspect the returned status.
+        - If the status is `FAILED` (or a specific network-related error like `TIMEOUT`), immediately invoke `wait_for_internet(dash)`.
+        - Post-wait evaluation:
+            - If `wait_for_internet` determines the internet was indeed down and is now restored, the script utilizes `continue` to instantly re-execute `download_url()` for the exact same link, without advancing the queue.
+            - If `wait_for_internet` confirms the internet was active the whole time (meaning the failure was a legitimate link/server issue), or if the initial download status was `SUCCESS`, `EXISTS`, etc., the script breaks the `while True:` loop and proceeds to log the result normally.
