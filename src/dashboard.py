@@ -96,7 +96,12 @@ class DashboardManager:
         text_row = Text(overall_str, style="yellow")
         
         if self.delay_msg:
-            style = "magenta" if "cooldown" in self.delay_msg.lower() else "yellow"
+            if "internet" in self.delay_msg.lower():
+                style = "bold red"
+            elif "cooldown" in self.delay_msg.lower():
+                style = "magenta"
+            else:
+                style = "yellow"
             text_row.append(f" | {self.delay_msg}", style=style)
             
         grid.add_row(text_row)
@@ -191,7 +196,7 @@ class DashboardManager:
         self.update_display()
 
     def set_pause(self, msg):
-        self.delay_msg = f"[bold red]{msg}[/bold red]"
+        self.delay_msg = msg
         self.update_display()
 
     def print_result(self, status, items, url):
