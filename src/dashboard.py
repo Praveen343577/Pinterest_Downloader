@@ -190,6 +190,10 @@ class DashboardManager:
         self.delay_msg = f"Session cooldown - resuming in {int(remaining//60):02d}:{int(remaining%60):02d} of {int(total//60):02d}:{int(total%60):02d}"
         self.update_display()
 
+    def set_pause(self, msg):
+        self.delay_msg = f"[bold red]{msg}[/bold red]"
+        self.update_display()
+
     def print_result(self, status, items, url):
         trunc_url = url[:80] + ("..." if len(url) > 80 else "")
         if status == "SUCCESS":
