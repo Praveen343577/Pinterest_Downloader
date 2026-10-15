@@ -99,7 +99,7 @@ class DashboardManager:
             if "internet" in self.delay_msg.lower():
                 style = "bold red"
             elif "cooldown" in self.delay_msg.lower():
-                style = "magenta"
+                style = "yellow"
             else:
                 style = "yellow"
             text_row.append(f" | {self.delay_msg}", style=style)
