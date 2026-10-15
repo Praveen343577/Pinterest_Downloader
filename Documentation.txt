@@ -524,3 +524,12 @@ Date : 8-Aug-2026
             - If `wait_for_internet` determines the internet was indeed down and is now restored, the script utilizes `continue` to instantly re-execute `download_url()` for the exact same link, without advancing the queue.
             - If `wait_for_internet` confirms the internet was active the whole time (meaning the failure was a legitimate link/server issue), or if the initial download status was `SUCCESS`, `EXISTS`, etc., the script breaks the `while True:` loop and proceeds to log the result normally.
             
+
+
+
+
+Date : 15-Oct-2026
+
+- Fix: Session Cooldown Message Color (`src/dashboard.py`) [MODIFY]
+    - The session cooldown status message was being rendered in magenta (purple) in the dashboard's bottom status line, visually inconsistent with the surrounding yellow text on the same row.
+    - Updated the color style branch in `_build_grid()` for the "cooldown" condition from `"magenta"` to `"yellow"`, so the message now blends uniformly with the rest of the time/ETA line.
